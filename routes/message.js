@@ -19,10 +19,20 @@ const history = load("history");
 const duplicateGuard = new Map();
 const rateWindow = new Map();
 const scheduleTimers = new Map();
+let scheduleRestoreInterval = null;
 
 function persistScheduleUpdate(item) {
   const updated = load("schedules").map((entry) => entry.id === item.id ? item : entry);
   save("schedules", updated);
+}
+
+function clearScheduleTimer(itemId) {
+  const timer = scheduleTimers.get(itemId);
+
+  if (timer) {
+    clearTimeout(timer);
+    scheduleTimers.delete(itemId);
+  }
 }
 
 function normalizeNumber(number) {
@@ -251,34 +261,58 @@ function buildRecipientNumber(rawNumber, rawDialCode = "") {
   return `${dialCode}${input}`;
 }
 
-function armSchedule(item) {
-  const delay = Math.max(0, new Date(item.scheduledFor).getTime() - Date.now());
-  const timer = setTimeout(async () => {
-    try {
-      logAudit("schedule.execute", {
-        id: item.id,
-        userId: item.userId,
-        scheduledFor: item.scheduledFor
-      });
+async function executeScheduledItem(item) {
+  try {
+    logAudit("schedule.execute", {
+      id: item.id,
+      userId: item.userId,
+      scheduledFor: item.scheduledFor
+    });
 
-      await dispatchMessage({
-        userId: item.userId,
-        numbers: item.numbers.length ? item.numbers : [item.number],
-        message: item.message,
-        templateId: item.templateId,
-        variables: item.variables,
-        mediaId: item.mediaId,
-        messageType: item.numbers.length ? "Scheduled Group" : "Scheduled Single"
+    await dispatchMessage({
+      userId: item.userId,
+      numbers: item.numbers.length ? item.numbers : [item.number],
+      message: item.message,
+      templateId: item.templateId,
+      variables: item.variables,
+      mediaId: item.mediaId,
+      messageType: item.numbers.length ? "Scheduled Group" : "Scheduled Single"
+    });
+    item.status = "sent";
+    delete item.error;
+  } catch (error) {
+    item.status = "failed";
+    item.error = error.message;
+  }
+
+  persistScheduleUpdate(item);
+  clearScheduleTimer(item.id);
+}
+
+function armSchedule(item) {
+  clearScheduleTimer(item.id);
+
+  const scheduledTime = new Date(item.scheduledFor).getTime();
+  const delay = Math.max(0, scheduledTime - Date.now());
+
+  if (delay === 0) {
+    queueMicrotask(() => {
+      executeScheduledItem(item).catch((error) => {
+        item.status = "failed";
+        item.error = error.message;
+        persistScheduleUpdate(item);
       });
-      item.status = "sent";
-      delete item.error;
-    } catch (error) {
+    });
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    executeScheduledItem(item).catch((error) => {
       item.status = "failed";
       item.error = error.message;
-    }
-
-    persistScheduleUpdate(item);
-    scheduleTimers.delete(item.id);
+      persistScheduleUpdate(item);
+      clearScheduleTimer(item.id);
+    });
   }, delay);
 
   scheduleTimers.set(item.id, timer);
@@ -329,7 +363,25 @@ function restoreSchedules() {
     .filter((item) => item.type === "one_time" && item.status === "scheduled");
 
   for (const item of schedules) {
-    if (scheduleTimers.has(item.id)) {
+    const scheduledTime = new Date(item.scheduledFor).getTime();
+
+    if (Number.isNaN(scheduledTime)) {
+      item.status = "failed";
+      item.error = "Invalid scheduled time";
+      persistScheduleUpdate(item);
+      clearScheduleTimer(item.id);
+      continue;
+    }
+
+    if (scheduledTime <= Date.now()) {
+      logAudit("schedule.catchup", {
+        id: item.id,
+        userId: item.userId,
+        scheduledFor: item.scheduledFor
+      });
+    }
+
+    if (scheduleTimers.has(item.id) && scheduledTime > Date.now()) {
       continue;
     }
 
@@ -426,12 +478,7 @@ router.post("/schedule", (req, res) => {
 
 router.delete("/schedule/:itemId", (req, res) => {
   const itemId = req.params.itemId;
-  const timer = scheduleTimers.get(itemId);
-
-  if (timer) {
-    clearTimeout(timer);
-    scheduleTimers.delete(itemId);
-  }
+  clearScheduleTimer(itemId);
 
   const updated = load("schedules").filter((item) => item.id !== itemId);
   save("schedules", updated);
@@ -440,5 +487,9 @@ router.delete("/schedule/:itemId", (req, res) => {
 });
 
 restoreSchedules();
+
+if (!scheduleRestoreInterval) {
+  scheduleRestoreInterval = setInterval(restoreSchedules, 60 * 1000);
+}
 
 module.exports = router;
