@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wa-Wenxi Login</title>
+  <style>
+    @font-face{font-family:"Nothing Headline";src:url("https://raw.githubusercontent.com/xeji01/nothingfont/main/fonts/NType82-Headline.otf") format("opentype");font-display:swap}
+    @font-face{font-family:"Nothing Text";src:url("https://raw.githubusercontent.com/xeji01/nothingfont/main/fonts/SpaceGrotesk-Regular.otf") format("opentype");font-display:swap}
+    @font-face{font-family:"Nothing Dot";src:url("https://raw.githubusercontent.com/xeji01/nothingfont/main/fonts/Ndot57-Regular.otf") format("opentype");font-display:swap}
+    :root{--bg:#140b14;--panel:#171115;--panel-soft:#211520;--line:rgba(255,255,255,.08);--text:#fff7fb;--muted:#c5b7c2;--pink:#f24eb6;--violet:#6c4cff;--glow:#ff8d4d;--shadow:0 40px 80px rgba(0,0,0,.42)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:"Nothing Text","Segoe UI",sans-serif;color:var(--text);background:
+      radial-gradient(circle at 20% 20%,rgba(242,78,182,.28),transparent 26%),
+      radial-gradient(circle at 80% 14%,rgba(255,141,77,.22),transparent 24%),
+      radial-gradient(circle at 70% 78%,rgba(108,76,255,.25),transparent 28%),
+      linear-gradient(135deg,#0f0810 0%,#1a0d14 44%,#120b12 100%);
+      overflow:hidden}
+    body::before,body::after{content:"";position:fixed;inset:auto;pointer-events:none}
+    body::before{width:520px;height:520px;top:-140px;right:-120px;background:radial-gradient(circle,rgba(255,173,104,.22),transparent 62%);filter:blur(12px)}
+    body::after{width:420px;height:420px;left:-120px;bottom:-100px;background:radial-gradient(circle,rgba(242,78,182,.18),transparent 65%);filter:blur(18px)}
+    .shell{min-height:100vh;display:grid;place-items:center;padding:34px}
+    .stage{width:min(1240px,100%);display:grid;grid-template-columns:1.08fr .92fr;border:1px solid rgba(255,255,255,.08);border-radius:36px;overflow:hidden;background:rgba(18,12,18,.88);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+    .visual{position:relative;min-height:760px;padding:42px;background:
+      linear-gradient(160deg,rgba(255,255,255,.04),transparent 44%),
+      radial-gradient(circle at 22% 20%,rgba(255,255,255,.08),transparent 20%),
+      linear-gradient(145deg,#1a101a 0%,#271126 40%,#120a14 100%)}
+    .visual::before,.visual::after{content:"";position:absolute;border-radius:30px;opacity:.8}
+    .visual::before{width:160px;height:160px;top:54px;left:42px;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04))}
+    .visual::after{width:220px;height:220px;right:52px;bottom:46px;background:linear-gradient(180deg,rgba(255,141,77,.22),rgba(108,76,255,.12))}
+    .brand{position:relative;z-index:2;display:flex;align-items:center;gap:14px;margin-bottom:32px}
+    .brand-box{width:64px;height:64px;border-radius:22px;background:linear-gradient(180deg,#140f17 0%,#09070d 100%);display:grid;place-items:center;border:1px solid rgba(255,255,255,.08);box-shadow:0 18px 30px rgba(0,0,0,.24)}
+    .brand-box img{width:76%;height:76%;object-fit:contain}
+    .brand-copy strong{display:block;font-family:"Nothing Dot","Nothing Headline",sans-serif;letter-spacing:.08em;font-size:18px;text-transform:uppercase}
+    .brand-copy span{display:block;color:var(--muted);margin-top:5px}
+    .headline{position:relative;z-index:2;max-width:520px;margin-top:40px}
+    .headline .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-family:"Nothing Dot","Nothing Text",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#ffd5ef;font-size:12px}
+    .headline h1{margin:22px 0 16px;font-size:clamp(40px,5vw,76px);line-height:.96;font-family:"Nothing Headline","Nothing Text",sans-serif;letter-spacing:-.03em}
+    .headline p{margin:0;color:#d4c7d0;max-width:430px;font-size:17px;line-height:1.7}
+    .visual-card{position:absolute;right:38px;top:118px;width:min(360px,44vw);z-index:2;background:rgba(16,10,17,.62);border:1px solid rgba(255,255,255,.09);border-radius:28px;padding:20px;backdrop-filter:blur(18px);transform:rotate(-3deg)}
+    .visual-card .mini{display:grid;gap:14px}
+    .visual-card .mini-bar{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--pink),#ff8d4d)}
+    .visual-card .mini-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .visual-card .mini-pill{height:66px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
+    .motion-wrap{position:absolute;left:50px;right:50px;bottom:46px;top:290px;border-radius:34px;overflow:hidden;border:1px solid rgba(255,255,255,.09);background:#120b13;box-shadow:0 24px 40px rgba(0,0,0,.28)}
+    .motion-wrap video{width:100%;height:100%;object-fit:cover;filter:saturate(1.08) contrast(1.06)}
+    .motion-overlay{position:absolute;inset:0;background:
+      linear-gradient(180deg,rgba(12,8,12,.24),transparent 30%,transparent 70%,rgba(12,8,12,.4)),
+      radial-gradient(circle at center,transparent 42%,rgba(0,0,0,.15))}
+    .motion-caption{position:absolute;left:26px;right:26px;bottom:24px;display:flex;justify-content:space-between;gap:18px;align-items:end}
+    .motion-caption strong{font-family:"Nothing Dot","Nothing Headline",sans-serif;font-size:18px;letter-spacing:.06em}
+    .motion-caption span{color:#eadbe5;font-size:13px;line-height:1.6}
+    .form-side{padding:44px 42px;display:grid;align-content:center;background:
+      linear-gradient(180deg,rgba(255,255,255,.03),transparent 26%),
+      radial-gradient(circle at 90% 16%,rgba(108,76,255,.18),transparent 30%),
+      linear-gradient(180deg,#140f16 0%,#110c13 100%)}
+    .form-shell{max-width:430px;margin:0 auto}
+    .top-actions{display:flex;justify-content:flex-end;margin-bottom:36px}
+    .status-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#f6d8ea;font-family:"Nothing Dot","Nothing Text",sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+    .status-pill::before{content:"";width:8px;height:8px;border-radius:999px;background:linear-gradient(180deg,var(--pink),#ff8d4d);box-shadow:0 0 0 6px rgba(242,78,182,.12)}
+    .login-card{padding:34px;border-radius:30px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));box-shadow:0 22px 40px rgba(0,0,0,.2)}
+    .login-card h2{margin:0 0 10px;font-family:"Nothing Headline","Nothing Text",sans-serif;font-size:42px;letter-spacing:-.03em}
+    .login-card p{margin:0;color:var(--muted);line-height:1.7}
+    .mode-tabs{display:flex;gap:10px;margin:28px 0 22px}
+    .mode-tab{flex:1;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03);color:#e8dfe5;cursor:pointer;font-family:"Nothing Dot","Nothing Text",sans-serif}
+    .mode-tab.active{background:linear-gradient(135deg,var(--pink),var(--violet));border-color:transparent;color:#fff;box-shadow:0 18px 26px rgba(108,76,255,.2)}
+    .field{margin-bottom:16px}
+    .field label{display:block;margin-bottom:8px;font-size:13px;font-family:"Nothing Dot","Nothing Text",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#ffe5f4}
+    .field input{width:100%;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.09);background:rgba(8,6,10,.54);outline:none;color:#fff;font:inherit}
+    .field input:focus{border-color:rgba(242,78,182,.5);box-shadow:0 0 0 3px rgba(242,78,182,.16)}
+    .helper-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0 20px;color:#d5c6d0;font-size:13px}
+    .helper-row .tip{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
+    .cta{width:100%;padding:16px 18px;border:0;border-radius:18px;background:linear-gradient(135deg,var(--pink),#ff8d4d);color:#fff;cursor:pointer;font-family:"Nothing Dot","Nothing Text",sans-serif;font-size:15px;letter-spacing:.05em;box-shadow:0 22px 32px rgba(242,78,182,.26)}
+    .cta:hover{filter:brightness(1.05)}
+    .message{min-height:58px;margin-top:18px;padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#f1deea;line-height:1.6}
+    .message.error{border-color:rgba(255,117,117,.22);background:rgba(255,80,80,.08);color:#ffc7c7}
+    .message.success{border-color:rgba(98,255,193,.18);background:rgba(56,166,119,.12);color:#cbffe6}
+    .hidden{display:none!important}
+    @media (max-width:1100px){.stage{grid-template-columns:1fr}.visual{min-height:640px}.form-side{padding-top:10px}}
+    @media (max-width:680px){.shell{padding:14px}.stage{border-radius:24px}.visual,.form-side{padding:24px}.motion-wrap{left:24px;right:24px;top:300px;bottom:24px}.login-card{padding:24px}.login-card h2{font-size:34px}.headline h1{font-size:42px}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="stage">
+      <section class="visual">
+        <div class="brand">
+          <div class="brand-box"><img src="/logo.png" alt="Wa-Wenxi logo"></div>
+          <div class="brand-copy">
+            <strong>Wa-Wenxi</strong>
+            <span>Playful login, serious WhatsApp operations.</span>
+          </div>
+        </div>
+
+        <div class="visual-card">
+          <div class="mini">
+            <div class="mini-bar"></div>
+            <div class="mini-row">
+              <div class="mini-pill"></div>
+              <div class="mini-pill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="headline">
+          <div class="eyebrow">Access portal</div>
+          <h1>.</h1>
+          <p>Sign in to manage WhatsApp devices, campaigns, contacts, templates, analytics, and every connected session from one place.</p>
+        </div>
+
+        <div class="motion-wrap">
+          <video autoplay muted loop playsinline>
+            <source src="/login-motion.mp4" type="video/mp4">
+          </video>
+          <div class="motion-overlay"></div>
+          <div class="motion-caption">
+            <div>
+              <strong>Pretty by design</strong>
+              <span>Inspired by the playful split-layout references you shared, while staying usable for real work.</span>
+            </div>
+            <div class="status-pill">Secure entry</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-side">
+        <div class="form-shell">
+          <div class="top-actions">
+            <div id="authModePill" class="status-pill">Loading</div>
+          </div>
+
+          <div class="login-card">
+            <h2 id="authTitle">Welcome back</h2>
+            <p id="authSubtitle">Log in to open your device dashboard.</p>
+
+            <div class="mode-tabs">
+              <button id="loginTab" class="mode-tab active" type="button">Login</button>
+              <button id="setupTab" class="mode-tab hidden" type="button">Create Admin</button>
+            </div>
+
+            <form id="authForm">
+              <div id="setupNameField" class="field hidden">
+                <label for="fullName">Full Name</label>
+                <input id="fullName" placeholder="Tadashi Wenxi">
+              </div>
+
+              <div class="field">
+                <label for="username">Username</label>
+                <input id="username" placeholder="admin">
+              </div>
+
+              <div class="field">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Enter password">
+              </div>
+
+              <div id="confirmField" class="field hidden">
+                <label for="confirmPassword">Confirm Password</label>
+                <input id="confirmPassword" type="password" placeholder="Repeat password">
+              </div>
+
+              <div class="helper-row">
+                <div class="tip" id="helperTip">First setup creates your admin account in SQLite.</div>
+                <span>Protected dashboard access</span>
+              </div>
+
+              <button id="submitBtn" class="cta" type="submit">Enter Wa-Wenxi</button>
+            </form>
+
+            <div id="authMessage" class="message">Checking authentication status...</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    let authMode = "login";
+    let needsSetup = false;
+
+    async function apiFetch(url, options) {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Request failed");
+      return data;
+    }
+
+    function setMessage(type, text) {
+      const node = document.getElementById("authMessage");
+      node.className = "message";
+      if (type) node.classList.add(type);
+      node.textContent = text;
+    }
+
+    function applyMode(mode) {
+      authMode = mode;
+      document.getElementById("loginTab").classList.toggle("active", mode === "login");
+      document.getElementById("setupTab").classList.toggle("active", mode === "setup");
+      document.getElementById("setupNameField").classList.toggle("hidden", mode !== "setup");
+      document.getElementById("confirmField").classList.toggle("hidden", mode !== "setup");
+      document.getElementById("authTitle").textContent = mode === "setup" ? "Create your admin" : "Welcome back";
+      document.getElementById("authSubtitle").textContent = mode === "setup"
+        ? "Set up the first admin account for your Wa-Wenxi workspace."
+        : "Log in to open your device dashboard.";
+      document.getElementById("submitBtn").textContent = mode === "setup" ? "Create Admin & Continue" : "Enter Wa-Wenxi";
+      document.getElementById("helperTip").textContent = mode === "setup"
+        ? "First setup creates your admin account in SQLite."
+        : "Use your database-backed admin credentials.";
+      document.getElementById("authModePill").textContent = mode === "setup" ? "Initial setup" : "Secure login";
+    }
+
+    async function loadStatus() {
+      const data = await apiFetch("/api/auth/status");
+
+      if (data.authenticated) {
+        window.location.href = "/";
+        return;
+      }
+
+      needsSetup = Boolean(data.needsSetup);
+      document.getElementById("setupTab").classList.toggle("hidden", !needsSetup);
+      applyMode(needsSetup ? "setup" : "login");
+      setMessage("", needsSetup ? "Create the first admin account to unlock the dashboard." : "Log in with your saved admin credentials.");
+    }
+
+    async function submitAuth(event) {
+      event.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!username || !password) {
+        setMessage("error", "Username aur password required hain.");
+        return;
+      }
+
+      if (authMode === "setup") {
+        const name = document.getElementById("fullName").value.trim();
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (!name) {
+          setMessage("error", "Full name required hai.");
+          return;
+        }
+
+        if (password.length < 6) {
+          setMessage("error", "Password kam se kam 6 characters ka hona chahiye.");
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setMessage("error", "Confirm password match nahi kar raha.");
+          return;
+        }
+
+        setMessage("", "Admin account create ho raha hai...");
+        await apiFetch("/api/auth/setup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password, name })
+        });
+      } else {
+        setMessage("", "Logging you in...");
+        await apiFetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+      }
+
+      setMessage("success", "Authenticated successfully. Redirecting...");
+      window.setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
+    }
+
+    document.getElementById("authForm").addEventListener("submit", (event) => {
+      submitAuth(event).catch((error) => {
+        setMessage("error", error.message || "Authentication failed");
+      });
+    });
+
+    document.getElementById("loginTab").addEventListener("click", () => {
+      if (!needsSetup) {
+        applyMode("login");
+      }
+    });
+
+    document.getElementById("setupTab").addEventListener("click", () => {
+      if (needsSetup) {
+        applyMode("setup");
+      }
+    });
+
+    loadStatus().catch((error) => {
+      setMessage("error", error.message || "Unable to load auth status");
+    });
+  </script>
+</body>
+</html>

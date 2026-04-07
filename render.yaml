@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: whatsapp-saas
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: STORAGE_ROOT
+        value: /var/data
+    disks:
+      - name: whatsapp-saas-disk
+        mountPath: /var/data
+        sizeGB: 5

@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wa-Wenxi</title>
+  <style>
+    @font-face{font-family:"Nothing Headline";src:url("https://raw.githubusercontent.com/xeji01/nothingfont/main/fonts/NType82-Headline.otf") format("opentype");font-display:swap}
+    @font-face{font-family:"Nothing Text";src:url("https://raw.githubusercontent.com/xeji01/nothingfont/main/fonts/SpaceGrotesk-Regular.otf") format("opentype");font-display:swap}
+    @font-face{font-family:"Nothing Dot";src:url("https://raw.githubusercontent.com/xeji01/nothingfont/main/fonts/Ndot57-Regular.otf") format("opentype");font-display:swap}
+    @font-face{font-family:"Nothing Mono";src:url("https://raw.githubusercontent.com/xeji01/nothingfont/main/fonts/LetteraMonoLL-Regular.otf") format("opentype");font-display:swap}
+    :root{--bg:#0e0c0d;--surface:#171515;--surface-2:#1f1b1b;--soft:#141111;--accent:#ff9b39;--accent-strong:#ff7f22;--accent-soft:rgba(255,155,57,.14);--text:#f5f1eb;--muted:#a99f97;--line:#2e2826;--shadow:0 24px 60px rgba(0,0,0,.35);--radius:18px}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:"Nothing Text","Segoe UI",Tahoma,Geneva,Verdana,sans-serif;color:var(--text);background:radial-gradient(circle at top right,rgba(255,146,56,.35),transparent 28%),radial-gradient(circle at bottom left,rgba(255,180,120,.12),transparent 24%),linear-gradient(135deg,#1b1412 0%,#0d0b0c 36%,#17110f 68%,#2c180f 100%)}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.04) 0,transparent 16%,transparent 84%,rgba(255,255,255,.03) 100%)}
+    button,input,textarea,select{font:inherit} input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0} input[type=number]{-moz-appearance:textfield;appearance:textfield}.app{display:grid;grid-template-columns:84px minmax(0,1280px);justify-content:center;min-height:100vh;padding:38px 28px}.sidebar{background:linear-gradient(180deg,#1c1919 0%,#151212 100%);border:1px solid var(--line);border-right:0;display:flex;flex-direction:column;align-items:center;gap:18px;padding:18px 0;border-radius:22px 0 0 22px;box-shadow:var(--shadow)}
+    .main{background:rgba(16,14,14,.96);border:1px solid var(--line);border-radius:0 22px 22px 0;box-shadow:var(--shadow);overflow:hidden}.brand-box,.nav-btn{width:42px;height:42px;border-radius:14px;display:grid;place-items:center}.brand-box{background:linear-gradient(180deg,#12161d 0%,#090b10 100%);color:#fff;font-weight:800;box-shadow:0 12px 24px rgba(0,0,0,.28);font-family:"Nothing Dot","Nothing Headline","Nothing Text",sans-serif;overflow:hidden} .nav-btn{border:0;background:transparent;color:#8f847b;font-size:0;cursor:pointer;position:relative}
+    .nav-btn.active{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-strong) 100%);color:#fff;box-shadow:0 14px 28px rgba(255,127,34,.28)} .topbar{height:76px;background:rgba(20,17,17,.96);border-bottom:1px solid var(--line);padding:0 26px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .top-left,.top-right,.actions,.tabs,.status-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.top-right{display:flex;margin-left:auto}.brand-row{display:flex;align-items:center;gap:12px}.brand-title{font-size:18px;font-weight:800;color:#fff;font-family:"Nothing Dot","Nothing Headline","Nothing Text",sans-serif;letter-spacing:.05em;text-transform:uppercase} .welcome{display:flex;align-items:center;gap:10px}
+    .avatar{width:40px;height:40px;border-radius:12px;background:rgba(255,155,57,.14);color:var(--accent);display:grid;place-items:center;font-weight:800}.welcome small,.top-right small,.muted{color:var(--muted)}
+    .btn,.btn-outline,.small-btn,.tab{border-radius:14px;font-weight:700;cursor:pointer;transition:.2s ease;font-family:"Nothing Dot","Nothing Text",sans-serif;letter-spacing:.04em}.btn{border:0;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-strong) 100%);color:#fff;padding:13px 20px;box-shadow:0 16px 26px rgba(255,127,34,.18)} .btn:hover{filter:brightness(1.06)} .btn-outline,.small-btn,.tab{border:1px solid var(--line);background:#171313;color:var(--text);padding:11px 16px}
+    .btn-outline:hover,.small-btn:hover,.tab:hover{border-color:#4a3a31;background:#1f1a19}.tab.active{border-color:rgba(255,155,57,.45);background:var(--accent-soft);color:#ffd3a6} .content{padding:26px}.hidden{display:none !important}.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px}
+    .page-head h1,.panel h2,.card h3{margin:0 0 8px;font-weight:800;font-family:"Nothing Dot","Nothing Headline","Nothing Text",sans-serif;letter-spacing:.04em;text-transform:uppercase}.page-head p,.card p,.panel p{margin:0;color:var(--muted);line-height:1.6}.summary,.layout,.stats,.management-grid{display:grid;gap:18px}.summary{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:22px}.layout{grid-template-columns:300px 1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.management-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:18px}
+    .card,.panel{background:linear-gradient(180deg,#171414 0%,#120f0f 100%);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 18px 30px rgba(0,0,0,.18)} .stat-card{padding:22px}.stat-card strong{display:block;font-size:34px;font-weight:800;color:#fff;font-family:"Nothing Dot","Nothing Headline",sans-serif;letter-spacing:.06em}.mode-card{padding:26px 24px;text-align:center}.mode-card.active{border-color:rgba(255,155,57,.5);box-shadow:0 0 0 1px rgba(255,155,57,.08),0 18px 30px rgba(0,0,0,.22)}
+    .mode-icon{width:78px;height:78px;margin:0 auto 16px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,rgba(255,182,120,.25),rgba(255,155,57,.08));font-size:34px;color:#ffd4ad}.panel{padding:24px}.field{margin-bottom:16px}.field label{display:block;margin-bottom:8px;font-size:14px;font-weight:700;color:#f0e5db}
+    .field small{display:block;margin-top:8px;color:var(--muted);font-size:12px;line-height:1.5}.input,.textarea,.select{width:100%;border:1px solid #322a28;border-radius:14px;background:#0f0d0d;color:var(--text);padding:15px 16px;outline:none;font-family:"Nothing Mono","Nothing Text",sans-serif}.input:focus,.textarea:focus,.select:focus{border-color:rgba(255,155,57,.55);box-shadow:0 0 0 3px rgba(255,155,57,.12)} .textarea{min-height:140px;resize:vertical}.grid-2,.grid-3{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.phone-grid{display:grid;grid-template-columns:220px 1fr;gap:12px}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#211b19;color:#cab8a8;font-size:13px;font-weight:700;border:1px solid #312925;font-family:"Nothing Dot","Nothing Text",sans-serif;letter-spacing:.03em}.badge.green{background:rgba(255,155,57,.14);color:#ffcb96;border-color:rgba(255,155,57,.25)} .dot{width:10px;height:10px;border-radius:999px;background:#7b6e67}.dot.online{background:#ffb15f}.spinner{width:12px;height:12px;border-radius:999px;border:2px solid #6a5e57;border-top-color:var(--accent);animation:spin .8s linear infinite}
+    .output{min-height:92px;border-radius:16px;border:1px dashed #3a302c;background:#100e0e;padding:18px;color:#cfc0b3;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap;margin-top:16px}.output.is-success{background:rgba(255,155,57,.08);border-style:solid;border-color:rgba(255,155,57,.25);color:#ffd3a8}.output.is-warning{background:rgba(255,180,74,.08);border-style:solid;border-color:rgba(255,180,74,.24);color:#ffe2ae}.output.is-error{background:rgba(255,90,90,.08);border-style:solid;border-color:rgba(255,90,90,.24);color:#ffb7b7}
+    .compact-status{min-height:0;padding:10px 12px;margin-top:10px;border-style:solid;border-radius:12px;font-size:12px;line-height:1.45}
+    .compact-status.is-idle{background:#120f0f;border-color:#2e2826;color:#a99f97}
+    .composer-actions{display:grid;gap:10px;margin-top:8px}
+    .composer-buttons{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .send-feedback{min-height:18px;font-size:12px;color:#a99f97;font-family:"Nothing Dot","Nothing Text",sans-serif;letter-spacing:.03em}
+    .send-feedback.success{color:#8ce6aa}.send-feedback.error{color:#ffaaaa}.send-feedback.warning{color:#ffd58b}
+    .composer-status{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:6px}
+    .signal-wrap{display:flex;align-items:center;gap:8px;font-size:12px;color:#d7c7b8;font-family:"Nothing Dot","Nothing Text",sans-serif;letter-spacing:.03em}
+    .signal-dot{width:10px;height:10px;border-radius:999px;background:#8a4f4f;box-shadow:0 0 0 4px rgba(138,79,79,.12)}
+    .signal-dot.good{background:#4fd27e;box-shadow:0 0 0 4px rgba(79,210,126,.12)}
+    .signal-dot.warn{background:#ffb14d;box-shadow:0 0 0 4px rgba(255,177,77,.14)}
+    .signal-dot.bad{background:#ff7070;box-shadow:0 0 0 4px rgba(255,112,112,.14)}
+    .mode-mini{font-size:11px;color:#bda997;font-family:"Nothing Dot","Nothing Text",sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid #2e2826;background:#151111}
+    .hidden-output{display:none !important}
+    .qr-output{display:grid;gap:14px;justify-items:start}.qr-image{width:min(240px,100%);padding:10px;border-radius:12px;background:#fff;border:1px solid var(--line)} .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#120f0f}
+    table{width:100%;border-collapse:collapse;min-width:760px} th,td{padding:16px;text-align:left;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top} th{font-size:13px;color:#e6d0bc;font-family:"Nothing Dot","Nothing Text",sans-serif;letter-spacing:.04em} .device-name{font-weight:800;margin-bottom:4px;color:#fff;font-family:"Nothing Headline","Nothing Text",sans-serif}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(8,8,8,.62);display:grid;place-items:center;padding:20px;z-index:50}.modal{width:min(560px,100%);background:linear-gradient(180deg,#1a1515 0%,#120f0f 100%);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:24px}
+    .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}.modal-head h2{margin:0 0 8px}.close-btn{border:0;background:transparent;color:#b7a89c;font-size:24px;cursor:pointer}
+    .mini-list{display:grid;gap:10px;margin-top:16px}.mini-item{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#141111}.mini-item strong{display:block;font-family:"Nothing Dot","Nothing Headline","Nothing Text",sans-serif;letter-spacing:.04em}.mini-item small{display:block;color:var(--muted);margin-top:4px}.stack{display:grid;gap:12px}.inline-actions{display:flex;gap:8px;flex-wrap:wrap}.tiny-btn{border:1px solid var(--line);background:#171313;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text);font-family:"Nothing Dot","Nothing Text",sans-serif}.tiny-btn.danger{color:#ff9a9a}.tiny-btn.success{color:#ffcb96}.check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:160px;overflow:auto;padding:12px;border:1px solid var(--line);border-radius:14px;background:#110f0f}.check-item{display:flex;align-items:center;gap:8px;font-size:13px}.pill-list{display:flex;flex-wrap:wrap;gap:8px}.pill{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#221b18;color:#ffd0a4;font-size:12px;font-weight:700;border:1px solid #3b2a20;font-family:"Nothing Dot","Nothing Text",sans-serif}.divider{height:1px;background:var(--line);margin:6px 0}.health-note{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.5;font-family:"Nothing Mono","Nothing Text",sans-serif}
+    .brand-logo{width:100%;height:100%;object-fit:contain;padding:4px;display:block}.logo-mark{width:20px;height:20px;display:block}.logo-mark path,.logo-mark rect,.logo-mark circle{fill:currentColor}.nav-icon{width:22px;height:22px;display:block}.nav-icon path,.nav-icon rect,.nav-icon circle,.nav-icon line,.nav-icon polyline{stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .welcome-text{display:flex;align-items:center;gap:6px;color:#f3ece4}.welcome-text strong{font-family:"Nothing Dot","Nothing Headline","Nothing Text",sans-serif;letter-spacing:.03em}
+    .menu-wrap{position:relative}.menu-toggle{width:30px;height:30px;border-radius:10px;border:1px solid var(--line);background:#171313;color:#d8c4b0;display:grid;place-items:center;cursor:pointer;font-family:"Nothing Dot","Nothing Text",sans-serif}
+    .menu-dropdown{position:absolute;top:38px;right:0;min-width:120px;padding:8px;background:#151212;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);display:none;z-index:20}
+    .menu-dropdown.open{display:block}.menu-item{width:100%;border:0;background:transparent;color:#ffb8b8;padding:9px 10px;border-radius:8px;text-align:left;cursor:pointer;font-family:"Nothing Dot","Nothing Text",sans-serif}
+    .menu-item:hover{background:rgba(255,90,90,.08)}
+    .toast-stack{position:fixed;top:18px;right:22px;display:grid;gap:10px;z-index:80}
+    .toast{min-width:250px;max-width:340px;padding:14px 16px;border-radius:14px;border:1px solid #3a302c;background:rgba(19,16,16,.96);box-shadow:var(--shadow);color:var(--text);font-family:"Nothing Text",sans-serif}
+    .toast.success{border-color:rgba(255,155,57,.3);background:rgba(42,26,14,.96);color:#ffd4aa}
+    .toast.warning{border-color:rgba(255,196,107,.28);background:rgba(45,34,15,.96);color:#ffe2ae}
+    .toast.error{border-color:rgba(255,90,90,.28);background:rgba(46,19,19,.96);color:#ffc0c0}
+    .sidebar .nav-btn::before{content:"";width:22px;height:22px;display:block;background-repeat:no-repeat;background-position:center;background-size:22px 22px;opacity:.95}
+    .sidebar .nav-btn:nth-of-type(1)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238f847b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='6' height='6' rx='1'/%3E%3Crect x='14' y='4' width='6' height='9' rx='1'/%3E%3Crect x='4' y='14' width='6' height='6' rx='1'/%3E%3Crect x='14' y='16' width='6' height='4' rx='1'/%3E%3C/svg%3E")}
+    .sidebar .nav-btn:nth-of-type(2)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238f847b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 6h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 3v-3H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z'/%3E%3Ccircle cx='9' cy='12' r='.8'/%3E%3Ccircle cx='12' cy='12' r='.8'/%3E%3Ccircle cx='15' cy='12' r='.8'/%3E%3C/svg%3E")}
+    .sidebar .nav-btn:nth-of-type(3)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238f847b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='2.5' width='8' height='19' rx='2'/%3E%3Cline x1='10' y1='6' x2='14' y2='6'/%3E%3Ccircle cx='12' cy='18' r='.8'/%3E%3C/svg%3E")}
+    .sidebar .nav-btn:nth-of-type(4)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238f847b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8'/%3E%3Cpath d='M12 8v5l3 2'/%3E%3Cpath d='M4 12H2'/%3E%3C/svg%3E")}
+    .sidebar .nav-btn.active::before{filter:brightness(2.2)}
+    .sidebar .nav-btn:nth-of-type(5){display:none}
+    @keyframes spin{to{transform:rotate(360deg)}} @media (max-width:1100px){.summary,.layout,.stats,.management-grid,.grid-3{grid-template-columns:1fr}} @media (max-width:760px){body{background:#0e0c0d}.app{grid-template-columns:1fr;padding:12px}.sidebar{flex-direction:row;justify-content:center;padding:12px;border-radius:20px 20px 0 0;border-right:1px solid var(--line)}.main{border-radius:0 0 20px 20px}.topbar{height:auto;padding:14px;flex-wrap:wrap}.content{padding:14px}.grid-2,.grid-3,.phone-grid,.check-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand-box" aria-label="Wa-Wenxi logo">
+        <img class="brand-logo" src="/logo.png" alt="Wa-Wenxi logo">
+      </div>
+      <button class="nav-btn" data-page="dashboard" title="Dashboard">⌘</button>
+      <button class="nav-btn active" data-page="messages" title="Messages">💬</button>
+      <button class="nav-btn" data-page="devices" title="Devices">📱</button>
+      <button class="nav-btn" data-page="history" title="History">🕘</button>
+      <button class="nav-btn" data-page="dashboard" title="Overview">▦</button>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="top-left">
+          <div class="brand-row"><div class="brand-box" aria-label="Wa-Wenxi logo"><img class="brand-logo" src="/logo.png" alt="Wa-Wenxi logo"></div><div class="brand-title">Wa-Wenxi</div></div>
+          <div class="welcome"><div id="profileAvatar" class="avatar">U</div><div class="welcome-text"><small>Welcome,</small><strong id="profileName">User</strong></div><div class="menu-wrap"><button id="profileMenuToggle" class="menu-toggle" type="button" aria-label="Profile menu">˅</button><div id="profileMenu" class="menu-dropdown"><button class="menu-item" type="button" onclick="logoutUser()">Logout</button></div></div></div>
+        </div>
+        <div class="top-right"><button class="btn-outline" type="button">↑ Upgrade</button><small>WEB session mode</small></div>
+      </header>
+
+      <main class="content">
+        <section id="page-dashboard" class="hidden">
+          <div class="page-head"><div><h1>Dashboard</h1><p>Overview of active sessions, sent messages, and current usage.</p></div></div>
+          <div class="summary">
+            <article class="card stat-card"><strong id="dashActiveSessions">0</strong><span>Active WhatsApp sessions</span></article>
+            <article class="card stat-card"><strong id="dashMessagesToday">00</strong><span>Today's total messages sent</span></article>
+            <article class="card stat-card"><strong>00 MB</strong><span>Images, videos & documents</span></article>
+            <article class="card stat-card"><strong id="dashApiRequests">00</strong><span>API requests made</span></article>
+          </div>
+          <div class="stats">
+            <article class="panel"><h2>Service you have</h2><p>Free Plan</p><div class="output is-success">Devices Active: <strong id="dashDeviceRatio">0/infinity</strong><br>Total Messages: <strong id="dashTotalMessages">0</strong></div></article>
+            <article class="panel"><h2>Messaging trend</h2><p>Daily sent messages progress</p><div class="output is-success">Today: <strong id="trendToday">0</strong><br>Last 7 days: <strong id="trendWeek">0</strong></div></article>
+          </div>
+          <div class="stats" style="margin-top:18px">
+            <article class="panel"><h2>Templates / Media</h2><div class="output">Templates: <strong id="dashTemplates">0</strong><br>Media files: <strong id="dashMedia">0</strong></div></article>
+            <article class="panel"><h2>Contacts / Team</h2><div class="output">Contacts: <strong id="dashContacts">0</strong><br>Operators: <strong id="dashOperators">0</strong></div></article>
+          </div>
+          <div class="stats" style="margin-top:18px">
+            <article class="panel"><h2>Delivery Insights</h2><div id="dashDeliveryInsights" class="output">Sent: 0<br>Failed: 0<br>Retried: 0</div></article>
+            <article class="panel"><h2>Device Health</h2><div id="dashDeviceHealth" class="output">Last QR refresh: -<br>Reconnect attempts: 0<br>Conflict warnings: 0</div></article>
+          </div>
+          <div class="management-grid">
+            <article class="panel">
+              <h2>Templates</h2>
+              <p>Reusable templates with variables like {name} and {order_id}.</p>
+              <div class="stack">
+                <input class="input" id="templateName" placeholder="Reminder template">
+                <input class="input" id="templateVariables" placeholder="name, order_id">
+                <textarea class="textarea" id="templateContent" placeholder="Hi {name}, your order {order_id} is ready."></textarea>
+                <button class="btn" type="button" onclick="createTemplate()">Save Template</button>
+              </div>
+              <div id="templateList" class="mini-list"></div>
+            </article>
+            <article class="panel">
+              <h2>Contacts & Lists</h2>
+              <p>Saved recipients, tags, and CSV import for quick group targeting.</p>
+              <div class="grid-2">
+                <div class="stack">
+                  <input class="input" id="contactName" placeholder="Client Name">
+                  <input class="input" id="contactNumber" placeholder="919355968324">
+                  <input class="input" id="contactTags" placeholder="clients, leads">
+                  <button class="btn" type="button" onclick="createContact()">Save Contact</button>
+                </div>
+                <div class="stack">
+                  <textarea class="textarea" id="contactsCsv" placeholder="Name,Number,Tags&#10;Amit,919355968324,lead"></textarea>
+                  <button class="btn-outline" type="button" onclick="importContactsCsv()">Import CSV</button>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="stack">
+                <input class="input" id="listName" placeholder="Team North">
+                <div id="listContacts" class="check-grid"></div>
+                <button class="btn-outline" type="button" onclick="createList()">Save List</button>
+              </div>
+              <div id="contactList" class="mini-list"></div>
+              <div id="savedLists" class="mini-list"></div>
+            </article>
+            <article class="panel">
+              <h2>Media Library</h2>
+              <p>Upload images or documents and reuse them from composer.</p>
+              <div class="grid-2">
+                <div class="stack">
+                  <input class="input" id="mediaName" placeholder="Invoice PDF">
+                  <select class="select" id="mediaType"><option value="document">Document</option><option value="image">Image</option></select>
+                  <input class="input" id="mediaCaption" placeholder="Optional caption">
+                </div>
+                <div class="stack">
+                  <input class="input" id="mediaMimeType" placeholder="application/pdf">
+                  <input class="input" id="mediaFile" type="file">
+                  <button class="btn" type="button" onclick="createMedia()">Upload Media</button>
+                </div>
+              </div>
+              <div id="mediaList" class="mini-list"></div>
+            </article>
+            <article class="panel">
+              <h2>Operators & Access</h2>
+              <p>Multiple operator accounts metadata, roles, and activity status.</p>
+              <div class="grid-3">
+                <input class="input" id="operatorName" placeholder="Support Agent">
+                <select class="select" id="operatorRole"><option value="viewer">Viewer</option><option value="sender">Sender</option><option value="manager">Manager</option><option value="admin">Admin</option></select>
+                <label class="badge" style="justify-content:center"><input id="operatorActive" type="checkbox" checked> Active</label>
+              </div>
+              <div class="actions"><button class="btn" type="button" onclick="createOperator()">Add Operator</button></div>
+              <div id="operatorList" class="mini-list"></div>
+            </article>
+            <article class="panel">
+              <h2>Scheduled Queue</h2>
+              <p>One-time future messages with timezone metadata.</p>
+              <div id="scheduleList" class="mini-list"></div>
+            </article>
+            <article class="panel">
+              <h2>Audit Log</h2>
+              <p>Recent device, message, and feature actions.</p>
+              <div id="auditList" class="mini-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="page-messages">
+          <div class="page-head"><div><h1>Send Message</h1><p>Single aur group messaging for all connected devices.</p></div></div>
+          <div class="layout">
+            <div>
+              <article id="singleCard" class="card mode-card active"><div class="mode-icon">💬</div><h3>Send Single Message</h3><p>Send a message to individual recipients.</p><button class="btn" type="button" onclick="switchMode('single')">Select</button></article>
+              <article id="groupCard" class="card mode-card" style="margin-top:18px"><div class="mode-icon">👥</div><h3>Group Message</h3><p>Send a message to multiple recipients at once.</p><button class="btn-outline" type="button" onclick="switchMode('group')">Select</button></article>
+            </div>
+            <section class="panel">
+              <div class="page-head" style="margin-bottom:12px"><div><h2>Message Composer</h2><p>Connect device, choose mode, and send.</p></div><div class="tabs"><button id="singleTab" class="tab active" type="button" onclick="switchMode('single')">Single</button><button id="groupTab" class="tab" type="button" onclick="switchMode('group')">Group</button></div></div>
+              <div class="grid-2">
+                <div class="field"><label for="userId">Device / User ID</label><select class="select" id="userId"><option value="">Select device</option></select><small>Devices page me jo IDs dikh rahi hain, wahi yahan select kar sakte ho.</small></div>
+                <div id="singleField" class="field"><label for="singleNumber">To</label><div class="phone-grid"><select class="select" id="countryCode"></select><input class="input" id="singleNumber" placeholder="Only mobile number"></div><small>Country code already select hai, yahan sirf number likho.</small></div>
+              </div>
+              <div id="groupField" class="field hidden"><label for="groupNumbers">Recipients</label><textarea class="textarea" id="groupNumbers" placeholder="919355968324, 916386001968&#10;919000000000"></textarea><small>Comma ya new line se multiple numbers add karo.</small></div>
+              <div class="grid-2">
+                <div class="field"><label for="templateId">Template</label><select class="select" id="templateId"><option value="">No template</option></select><small>Reusable templates with variables supported.</small></div>
+                <div class="field"><label for="mediaId">Media / Document</label><select class="select" id="mediaId"><option value="">No media</option></select><small>Recent uploaded files picker.</small></div>
+              </div>
+              <div class="field"><label for="message">Message</label><textarea class="textarea" id="message" placeholder="Type your WhatsApp message here"></textarea></div>
+              <div class="grid-2">
+                <div class="field"><label for="repeatCount">Repeat send</label><input class="input" id="repeatCount" type="number" min="1" max="15" value="1"><small>Ek hi number par same message 1 se 15 baar bhej sakte ho.</small></div>
+                <div class="field"><label for="timezone">Timezone</label><select class="select" id="timezone"><option value="Asia/Calcutta">Asia/Calcutta</option><option value="UTC">UTC</option><option value="Europe/London">Europe/London</option><option value="America/New_York">America/New_York</option></select><small>Timezone-aware scheduled delivery.</small></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label for="scheduleAt">Schedule for later</label><input class="input" id="scheduleAt" type="datetime-local"><small>One-time future send. Recurring intentionally disabled.</small></div>
+                <div class="field"><label>&nbsp;</label><div class="compact-status is-idle">Immediate send ke liye schedule blank chhodo.</div></div>
+              </div>
+              <div class="field hidden" id="groupConfirmWrap"><label><input id="groupConfirm" type="checkbox"> Confirm before large group blast</label><small>10+ recipients group send ke liye confirmation required hai.</small></div>
+              <div class="composer-actions">
+                <div class="composer-buttons"><button class="btn" type="button" onclick="sendMessage()">Send Message</button></div>
+                <div id="sendFeedback" class="send-feedback">Ready to send.</div>
+              </div>
+              <div class="composer-status">
+                <div class="signal-wrap"><span id="connectionSignal" class="signal-dot"></span><span id="connectionText">Idle</span></div>
+                <div class="mode-mini"><span id="modeBadgeText">single</span> | web</div>
+              </div>
+              <div id="qr" class="output compact-status is-idle hidden-output">QR ya connection status yahan show hoga.</div>
+              <div id="qrHint" class="health-note hidden-output">QR countdown idle.</div>
+              <div id="result" class="output compact-status is-idle hidden-output">Message response yahan show hoga.</div>
+            </section>
+          </div>
+        </section>
+
+        <section id="page-devices" class="hidden">
+          <div class="page-head"><div><h1>Devices</h1><p>Monitor active WhatsApp sessions and register new devices.</p></div><button class="btn" type="button" onclick="openRegisterModal()">Register New Device</button></div>
+          <section class="panel">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>DEVICE</th><th>STATUS</th><th>MESSAGES SENT</th><th>LAST ACTIVE</th><th>MOBILE</th><th>ACTIONS</th></tr></thead>
+                <tbody id="devicesRows"><tr><td colspan="6">No devices yet</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="page-history" class="hidden">
+          <div class="page-head"><div><h1>Message History</h1><p>Last sent messages from your connected devices.</p></div></div>
+          <div class="grid-2" style="margin-bottom:16px">
+            <div class="field"><label for="historyUserFilter">Filter by device</label><select class="select" id="historyUserFilter"><option value="">All devices</option></select></div>
+            <div class="field"><label for="historyTypeFilter">Filter by type</label><select class="select" id="historyTypeFilter"><option value="">All types</option><option value="single">Single</option><option value="group">Group</option><option value="media">Media</option><option value="scheduled single">Scheduled Single</option><option value="scheduled group">Scheduled Group</option></select></div>
+          </div>
+          <div class="grid-2" style="margin-bottom:16px">
+            <div class="field"><label for="historyStatusFilter">Filter by status</label><select class="select" id="historyStatusFilter"><option value="">All status</option><option value="sent">Sent</option><option value="failed">Failed</option></select></div>
+            <div class="field"><label for="historyFromFilter">From date</label><input class="input" id="historyFromFilter" type="date"></div>
+          </div>
+          <div class="grid-2" style="margin-bottom:16px">
+            <div class="field"><label for="historyToFilter">To date</label><input class="input" id="historyToFilter" type="date"></div>
+            <div class="field"><label>&nbsp;</label><button class="btn-outline" type="button" onclick="loadHistory().catch(console.error)">Apply Filters</button></div>
+          </div>
+          <section class="panel">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Sent Time</th><th>From (Device)</th><th>To</th><th>Content</th><th>Status</th><th>Type</th></tr></thead>
+                <tbody id="historyRows"><tr><td colspan="6">No messages yet</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="registerModal" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2>Register New Device</h2>
+          <p class="muted">Yahin se new device add karo aur QR scan karo.</p>
+        </div>
+        <button class="close-btn" type="button" onclick="closeRegisterModal()">×</button>
+      </div>
+
+      <div class="field">
+        <label for="modalUserId">Device / User ID</label>
+        <input class="input" id="modalUserId" placeholder="user2">
+        <small>Har naya device ke liye unique user ID rakho.</small>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" onclick="registerDeviceFromModal()">Generate QR</button>
+        <button class="btn-outline" type="button" onclick="closeRegisterModal()">Cancel</button>
+      </div>
+
+      <div id="modalQr" class="output">QR yahan show hoga.</div>
+      <div id="modalQrHint" class="health-note">QR countdown idle.</div>
+    </div>
+  </div>
+
+  <div id="toastStack" class="toast-stack"></div>
+
+  <script>
+    let activeMode = "single";
+    let apiRequests = 0;
+    let refreshingDeviceId = "";
+    let devicesPollTimer = null;
+    let qrCountdownUntil = 0;
+    let qrCountdownTimer = null;
+    let modalWatchUserId = "";
+    const modalConnectedAnnouncements = new Set();
+    let authUser = null;
+    const featureState = {
+      templates: [],
+      contacts: [],
+      lists: [],
+      media: [],
+      operators: [],
+      schedules: [],
+      audit: []
+    };
+    let deviceState = [];
+    const countryOptions = [
+      ["IN", "India", "+91"], ["US", "United States", "+1"], ["GB", "United Kingdom", "+44"], ["CA", "Canada", "+1"],
+      ["AU", "Australia", "+61"], ["AE", "United Arab Emirates", "+971"], ["SA", "Saudi Arabia", "+966"], ["QA", "Qatar", "+974"],
+      ["KW", "Kuwait", "+965"], ["OM", "Oman", "+968"], ["BH", "Bahrain", "+973"], ["PK", "Pakistan", "+92"],
+      ["BD", "Bangladesh", "+880"], ["NP", "Nepal", "+977"], ["LK", "Sri Lanka", "+94"], ["AF", "Afghanistan", "+93"],
+      ["CN", "China", "+86"], ["JP", "Japan", "+81"], ["KR", "South Korea", "+82"], ["SG", "Singapore", "+65"],
+      ["MY", "Malaysia", "+60"], ["TH", "Thailand", "+66"], ["ID", "Indonesia", "+62"], ["PH", "Philippines", "+63"],
+      ["VN", "Vietnam", "+84"], ["KH", "Cambodia", "+855"], ["LA", "Laos", "+856"], ["MM", "Myanmar", "+95"],
+      ["TR", "Turkey", "+90"], ["IR", "Iran", "+98"], ["IQ", "Iraq", "+964"], ["EG", "Egypt", "+20"],
+      ["ZA", "South Africa", "+27"], ["NG", "Nigeria", "+234"], ["KE", "Kenya", "+254"], ["ET", "Ethiopia", "+251"],
+      ["DE", "Germany", "+49"], ["FR", "France", "+33"], ["ES", "Spain", "+34"], ["IT", "Italy", "+39"],
+      ["NL", "Netherlands", "+31"], ["BE", "Belgium", "+32"], ["CH", "Switzerland", "+41"], ["AT", "Austria", "+43"],
+      ["SE", "Sweden", "+46"], ["NO", "Norway", "+47"], ["DK", "Denmark", "+45"], ["FI", "Finland", "+358"],
+      ["PL", "Poland", "+48"], ["PT", "Portugal", "+351"], ["GR", "Greece", "+30"], ["IE", "Ireland", "+353"],
+      ["RU", "Russia", "+7"], ["UA", "Ukraine", "+380"], ["RO", "Romania", "+40"], ["CZ", "Czech Republic", "+420"],
+      ["HU", "Hungary", "+36"], ["MX", "Mexico", "+52"], ["BR", "Brazil", "+55"], ["AR", "Argentina", "+54"],
+      ["CL", "Chile", "+56"], ["CO", "Colombia", "+57"], ["PE", "Peru", "+51"], ["VE", "Venezuela", "+58"],
+      ["NZ", "New Zealand", "+64"], ["IL", "Israel", "+972"], ["JO", "Jordan", "+962"], ["LB", "Lebanon", "+961"]
+    ];
+
+    function formatDateTime(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    }
+
+    function flagFromCode(code) {
+      return code
+        .toUpperCase()
+        .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
+    }
+
+    function populateCountryCodes() {
+      const select = document.getElementById("countryCode");
+      select.innerHTML = countryOptions.map(([iso, name, dial]) => `
+        <option value="${dial}">${flagFromCode(iso)} ${name} (${dial})</option>
+      `).join("");
+      select.value = "+91";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function updateQrCountdown() {
+      const seconds = Math.max(0, Math.ceil((qrCountdownUntil - Date.now()) / 1000));
+      const text = seconds > 0 ? `Fresh QR live for about ${seconds}s.` : "QR countdown idle.";
+      document.getElementById("qrHint").textContent = text;
+      document.getElementById("modalQrHint").textContent = text;
+
+      if (seconds <= 0 && qrCountdownTimer) {
+        clearInterval(qrCountdownTimer);
+        qrCountdownTimer = null;
+      }
+    }
+
+    function startQrCountdown(seconds = 60) {
+      qrCountdownUntil = Date.now() + (seconds * 1000);
+      if (qrCountdownTimer) clearInterval(qrCountdownTimer);
+      updateQrCountdown();
+      qrCountdownTimer = setInterval(updateQrCountdown, 1000);
+    }
+
+    async function apiFetch(url, options) {
+      apiRequests += 1;
+      document.getElementById("dashApiRequests").textContent = String(apiRequests).padStart(2, "0");
+      const response = await fetch(url, options);
+      if (response.status === 401) {
+        window.location.href = "/login";
+        throw new Error("Authentication required");
+      }
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Request failed");
+      return data;
+    }
+
+    function applyAuthUser(user) {
+      authUser = user;
+      const name = user?.name || "User";
+      document.getElementById("profileName").textContent = name;
+      document.getElementById("profileAvatar").textContent = name.slice(0, 1).toUpperCase();
+    }
+
+    async function loadAuthUser() {
+      const data = await apiFetch("/api/auth/me");
+      applyAuthUser(data.user);
+    }
+
+    function showPage(page) {
+      ["dashboard", "messages", "devices", "history"].forEach((name) => {
+        document.getElementById(`page-${name}`).classList.toggle("hidden", name !== page);
+      });
+      document.querySelectorAll(".nav-btn[data-page]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.page === page);
+      });
+    }
+
+    function switchMode(mode) {
+      activeMode = mode;
+      document.getElementById("modeBadgeText").textContent = mode;
+      document.getElementById("groupField").classList.toggle("hidden", mode !== "group");
+      document.getElementById("groupConfirmWrap").classList.toggle("hidden", mode !== "group");
+      document.getElementById("singleField").classList.toggle("hidden", mode !== "single");
+      document.getElementById("singleTab").classList.toggle("active", mode === "single");
+      document.getElementById("groupTab").classList.toggle("active", mode === "group");
+      document.getElementById("singleCard").classList.toggle("active", mode === "single");
+      document.getElementById("groupCard").classList.toggle("active", mode === "group");
+    }
+
+    function setStatus(message) {
+      const normalized = String(message || "idle").toLowerCase();
+      const signal = document.getElementById("connectionSignal");
+      const signalText = document.getElementById("connectionText");
+      signal.className = "signal-dot";
+      if (["connected", "online"].includes(normalized)) {
+        signal.classList.add("good");
+      } else if (["connecting", "qr_ready", "waiting", "waiting_for_qr", "relogin_requested"].includes(normalized)) {
+        signal.classList.add("warn");
+      } else {
+        signal.classList.add("bad");
+      }
+      signalText.textContent = String(message || "idle");
+    }
+
+    function openRegisterModal() {
+      document.getElementById("registerModal").classList.remove("hidden");
+      document.getElementById("modalQr").className = "output";
+      document.getElementById("modalQr").textContent = "QR yahan show hoga.";
+      document.getElementById("modalQrHint").textContent = "QR countdown idle.";
+      const currentUser = document.getElementById("userId").value.trim();
+      document.getElementById("modalUserId").value = currentUser || "";
+    }
+
+    function closeRegisterModal() {
+      document.getElementById("registerModal").classList.add("hidden");
+      modalWatchUserId = "";
+    }
+
+    function clearInlineQr() {
+      const qrBox = document.getElementById("qr");
+      qrBox.className = "output compact-status is-idle hidden-output";
+      qrBox.textContent = "QR ya connection status yahan show hoga.";
+      document.getElementById("qrHint").className = "health-note hidden-output";
+      document.getElementById("qrHint").textContent = "QR countdown idle.";
+      if (qrCountdownTimer) {
+        clearInterval(qrCountdownTimer);
+        qrCountdownTimer = null;
+      }
+      qrCountdownUntil = 0;
+    }
+
+    function setOutputState(id, type, message) {
+      const element = document.getElementById(id);
+      const compact = ["qr", "result"].includes(id) ? "output compact-status" : "output";
+      element.className = `${compact} hidden-output`;
+      if (type) element.classList.add(type);
+      element.textContent = message;
+    }
+
+    function setSendFeedback(message, tone = "") {
+      const feedback = document.getElementById("sendFeedback");
+      feedback.className = "send-feedback";
+      if (tone) {
+        feedback.classList.add(tone);
+      }
+      feedback.textContent = message;
+    }
+
+    function renderQrString(qrText) {
+      const qrBox = document.getElementById("qr");
+      qrBox.className = "output is-success qr-output";
+      qrBox.innerHTML = `<img class="qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(qrText)}" alt="WhatsApp QR code"><div>Is QR ko WhatsApp Linked Devices se scan karo.</div>`;
+      document.getElementById("qrHint").className = "health-note";
+      startQrCountdown();
+    }
+
+    function showToast(message, type = "success") {
+      const stack = document.getElementById("toastStack");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      stack.appendChild(toast);
+      window.setTimeout(() => {
+        toast.remove();
+      }, 3200);
+    }
+
+    async function loadFeatureData() {
+      const [templates, contacts, lists, media, operators, schedules, audit] = await Promise.all([
+        apiFetch("http://localhost:5000/api/features/templates"),
+        apiFetch("http://localhost:5000/api/features/contacts"),
+        apiFetch("http://localhost:5000/api/features/lists"),
+        apiFetch("http://localhost:5000/api/features/media"),
+        apiFetch("http://localhost:5000/api/features/operators"),
+        apiFetch("http://localhost:5000/api/features/schedules"),
+        apiFetch("http://localhost:5000/api/features/audit")
+      ]);
+
+      featureState.templates = templates.items || [];
+      featureState.contacts = contacts.items || [];
+      featureState.lists = lists.items || [];
+      featureState.media = media.items || [];
+      featureState.operators = operators.items || [];
+      featureState.schedules = schedules.items || [];
+      featureState.audit = audit.items || [];
+
+      document.getElementById("dashTemplates").textContent = featureState.templates.length;
+      document.getElementById("dashMedia").textContent = featureState.media.length;
+      document.getElementById("dashContacts").textContent = featureState.contacts.length;
+      document.getElementById("dashOperators").textContent = featureState.operators.length;
+      document.getElementById("templateId").innerHTML = `<option value="">No template</option>` + featureState.templates.map((item) => `<option value="${item.id}">${escapeHtml(item.name)}</option>`).join("");
+      document.getElementById("mediaId").innerHTML = `<option value="">No media</option>` + featureState.media.map((item) => `<option value="${item.id}">${escapeHtml(item.name)} (${escapeHtml(item.type)})</option>`).join("");
+      document.getElementById("listContacts").innerHTML = featureState.contacts.length
+        ? featureState.contacts.map((item) => `<label class="check-item"><input type="checkbox" value="${item.id}"> ${escapeHtml(item.name || item.number)} <span class="muted">${escapeHtml(item.number)}</span></label>`).join("")
+        : `<div class="muted">Pehle contacts add karo.</div>`;
+      document.getElementById("templateList").innerHTML = featureState.templates.length
+        ? featureState.templates.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.content)}</small><div class="pill-list">${(item.variables || []).map((variable) => `<span class="pill">${escapeHtml(variable)}</span>`).join("")}</div></div><div class="inline-actions"><button class="tiny-btn danger" type="button" onclick="deleteFeatureItem('templates', '${item.id}')">Delete</button></div></div>`).join("")
+        : `<div class="mini-item"><div><strong>No templates</strong><small>Saved templates yahan dikhengi.</small></div></div>`;
+      document.getElementById("contactList").innerHTML = featureState.contacts.length
+        ? featureState.contacts.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.name || "Unnamed contact")}</strong><small>${escapeHtml(item.number)}</small><div class="pill-list">${(item.tags || []).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div></div><div class="inline-actions"><button class="tiny-btn danger" type="button" onclick="deleteFeatureItem('contacts', '${item.id}')">Delete</button></div></div>`).join("")
+        : `<div class="mini-item"><div><strong>No contacts</strong><small>CSV import ya manual add use karo.</small></div></div>`;
+      document.getElementById("savedLists").innerHTML = featureState.lists.length
+        ? featureState.lists.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.name)}</strong><small>${item.contactIds?.length || 0} contacts</small></div><div class="inline-actions"><button class="tiny-btn success" type="button" onclick="applyListToGroup('${item.id}')">Use In Group</button><button class="tiny-btn danger" type="button" onclick="deleteFeatureItem('lists', '${item.id}')">Delete</button></div></div>`).join("")
+        : `<div class="mini-item"><div><strong>No lists</strong><small>Saved groups yahan dikhengi.</small></div></div>`;
+      document.getElementById("mediaList").innerHTML = featureState.media.length
+        ? featureState.media.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.type)} | ${escapeHtml(item.mimeType || "-")}</small></div><div class="inline-actions"><button class="tiny-btn success" type="button" onclick="useMediaInComposer('${item.id}')">Use</button><button class="tiny-btn danger" type="button" onclick="deleteFeatureItem('media', '${item.id}')">Delete</button></div></div>`).join("")
+        : `<div class="mini-item"><div><strong>No media</strong><small>Upload image ya document to reuse in composer.</small></div></div>`;
+      document.getElementById("operatorList").innerHTML = featureState.operators.length
+        ? featureState.operators.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.role)} | ${item.active ? "active" : "inactive"}</small></div><div class="inline-actions"><button class="tiny-btn danger" type="button" onclick="deleteFeatureItem('operators', '${item.id}')">Delete</button></div></div>`).join("")
+        : `<div class="mini-item"><div><strong>No operators</strong><small>Operator roles yahan dikhengi.</small></div></div>`;
+      document.getElementById("scheduleList").innerHTML = featureState.schedules.length
+        ? featureState.schedules.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.userId || "-")}</strong><small>${escapeHtml(item.status)} | ${formatDateTime(item.scheduledFor)} | ${escapeHtml(item.timezone || "Asia/Calcutta")}</small></div><div class="inline-actions"><button class="tiny-btn danger" type="button" onclick="deleteSchedule('${item.id}')">Delete</button></div></div>`).join("")
+        : `<div class="mini-item"><div><strong>No scheduled messages</strong><small>Future one-time messages yahan dikhengi.</small></div></div>`;
+      document.getElementById("auditList").innerHTML = featureState.audit.length
+        ? featureState.audit.slice(0, 12).map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.action)}</strong><small>${formatDateTime(item.createdAt)}</small></div></div>`).join("")
+        : `<div class="mini-item"><div><strong>No audit logs</strong><small>Recent actions yahan track hongi.</small></div></div>`;
+    }
+
+    function populateDeviceSelect(devices) {
+      const select = document.getElementById("userId");
+      const currentValue = select.value;
+
+      select.innerHTML = `<option value="">Select device</option>` + devices.map((device) => `
+        <option value="${device.userId}">${escapeHtml(device.deviceName || device.userId)}${device.active ? " (Online)" : ""}</option>
+      `).join("");
+
+      if (devices.some((device) => device.userId === currentValue)) {
+        select.value = currentValue;
+        return;
+      }
+
+      const onlineDevice = devices.find((device) => device.active);
+      const firstDevice = devices[0];
+      select.value = onlineDevice?.userId || firstDevice?.userId || "";
+      document.getElementById("historyUserFilter").innerHTML = `<option value="">All devices</option>` + devices.map((device) => `<option value="${device.userId}">${device.userId}</option>`).join("");
+    }
+
+    function renderModalQrString(qrText) {
+      const qrBox = document.getElementById("modalQr");
+      qrBox.className = "output is-success qr-output";
+      qrBox.innerHTML = `<img class="qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(qrText)}" alt="WhatsApp QR code"><div>Is QR ko WhatsApp Linked Devices se scan karo.</div>`;
+      startQrCountdown();
+    }
+
+    async function loadDevices() {
+      const data = await apiFetch("http://localhost:5000/api/device");
+      const devices = data.devices || [];
+      deviceState = devices;
+      const watchedDevice = modalWatchUserId ? devices.find((device) => device.userId === modalWatchUserId) : null;
+
+      if (watchedDevice?.active) {
+        document.getElementById("userId").value = watchedDevice.userId;
+        setStatus("connected");
+        clearInlineQr();
+        setSendFeedback(`Connected new device: ${watchedDevice.deviceName || watchedDevice.userId}`, "success");
+        if (!modalConnectedAnnouncements.has(watchedDevice.userId)) {
+          showToast(`Connected new device: ${watchedDevice.deviceName || watchedDevice.userId}`, "success");
+          modalConnectedAnnouncements.add(watchedDevice.userId);
+        }
+        closeRegisterModal();
+      }
+
+      const rows = document.getElementById("devicesRows");
+      populateDeviceSelect(devices);
+      rows.innerHTML = devices.length ? devices.map((device) => `
+        <tr>
+          <td><div class="device-name">${device.deviceName || device.userId}</div><div class="muted">${device.userId}</div><div class="health-note">Health ${device.sessionHealth || 0}% | QR ${formatDateTime(device.lastQrRefreshAt)} | Retries ${device.reconnectAttempts || 0}${device.conflictWarning ? " | Conflict warning" : ""}</div></td>
+          <td><span class="badge ${device.active ? "green" : ""}">${refreshingDeviceId === device.userId ? '<span class="spinner"></span>' : `<span class="dot ${device.active ? "online" : ""}"></span>`}${refreshingDeviceId === device.userId ? "connecting" : (device.active ? "Online" : device.status)}</span></td>
+          <td>${device.messagesSent}</td>
+          <td>${formatDateTime(device.lastActive)}</td>
+          <td>${device.mobile || "-"}</td>
+          <td><div class="actions"><button class="small-btn" type="button" ${refreshingDeviceId === device.userId ? "disabled" : ""} onclick="refreshDevice('${device.userId}')">${refreshingDeviceId === device.userId ? "Refreshing..." : "Refresh"}</button><button class="small-btn" type="button" onclick="reloginDevice('${device.userId}')">Re-Login</button><button class="small-btn" type="button" onclick="editDeviceName('${device.userId}')">Rename</button><button class="small-btn" type="button" onclick="deleteDevice('${device.userId}')">Remove</button></div></td>
+        </tr>
+      `).join("") : `<tr><td colspan="6">No devices yet</td></tr>`;
+
+      const activeSessions = devices.filter((item) => item.active).length;
+      const totalMessages = devices.reduce((sum, item) => sum + (item.messagesSent || 0), 0);
+      const totalFailed = devices.reduce((sum, item) => sum + (item.failedCount || 0), 0);
+      const totalRetried = devices.reduce((sum, item) => sum + (item.retriedCount || 0), 0);
+      const totalReconnects = devices.reduce((sum, item) => sum + (item.reconnectAttempts || 0), 0);
+      const conflicts = devices.filter((item) => item.conflictWarning).length;
+      const lastQrRefresh = devices.map((item) => item.lastQrRefreshAt).filter(Boolean).sort().reverse()[0];
+      document.getElementById("dashActiveSessions").textContent = activeSessions;
+      document.getElementById("dashDeviceRatio").textContent = `${devices.length}/infinity`;
+      document.getElementById("dashTotalMessages").textContent = totalMessages;
+      document.getElementById("dashMessagesToday").textContent = String(totalMessages).padStart(2, "0");
+      document.getElementById("trendToday").textContent = totalMessages;
+      document.getElementById("trendWeek").textContent = totalMessages;
+      document.getElementById("dashDeliveryInsights").innerHTML = `Sent: <strong>${totalMessages}</strong><br>Failed: <strong>${totalFailed}</strong><br>Retried: <strong>${totalRetried}</strong>`;
+      document.getElementById("dashDeviceHealth").innerHTML = `Last QR refresh: <strong>${formatDateTime(lastQrRefresh)}</strong><br>Reconnect attempts: <strong>${totalReconnects}</strong><br>Conflict warnings: <strong>${conflicts}</strong>`;
+    }
+
+    async function loadHistory() {
+      const userId = document.getElementById("historyUserFilter").value;
+      const messageType = document.getElementById("historyTypeFilter").value;
+      const status = document.getElementById("historyStatusFilter").value;
+      const from = document.getElementById("historyFromFilter").value;
+      const to = document.getElementById("historyToFilter").value;
+      const query = new URLSearchParams();
+      if (userId) query.set("userId", userId);
+      if (messageType) query.set("messageType", messageType);
+      if (status) query.set("status", status);
+      if (from) query.set("from", `${from}T00:00:00.000Z`);
+      if (to) query.set("to", `${to}T23:59:59.999Z`);
+      const data = await apiFetch(query.toString() ? `http://localhost:5000/api/message/history?${query.toString()}` : "http://localhost:5000/api/message/history");
+      const items = data.history || [];
+      const rows = document.getElementById("historyRows");
+      rows.innerHTML = items.length ? items.map((item) => `
+        <tr>
+          <td>${formatDateTime(item.time)}</td>
+          <td>${item.fromDevice}<div class="muted">${item.userId}</div></td>
+          <td>${item.to}</td>
+          <td>${item.content.length > 50 ? item.content.slice(0, 50) + "..." : item.content}</td>
+          <td><span class="badge ${String(item.status).toLowerCase() === "sent" ? "green" : ""}">${item.status}</span></td>
+          <td><span class="badge">${item.mode}</span></td>
+        </tr>
+      `).join("") : `<tr><td colspan="6">No messages yet</td></tr>`;
+    }
+
+    async function loadDashboardInsights() {
+      const data = await apiFetch("http://localhost:5000/api/message/history");
+      const items = data.history || [];
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      const todayCount = items.filter((item) => new Date(item.time).getTime() >= startOfToday && String(item.status).toLowerCase() === "sent").length;
+      const weekItems = items.filter((item) => new Date(item.time).getTime() >= sevenDaysAgo);
+      const byDevice = weekItems.reduce((acc, item) => {
+        acc[item.userId] = (acc[item.userId] || 0) + 1;
+        return acc;
+      }, {});
+      const byRecipient = weekItems.reduce((acc, item) => {
+        acc[item.to] = (acc[item.to] || 0) + 1;
+        return acc;
+      }, {});
+      const topDevice = Object.entries(byDevice).sort((a, b) => b[1] - a[1])[0];
+      const topRecipient = Object.entries(byRecipient).sort((a, b) => b[1] - a[1])[0];
+
+      document.getElementById("trendToday").textContent = todayCount;
+      document.getElementById("trendWeek").textContent = weekItems.length;
+      document.getElementById("dashDeliveryInsights").innerHTML += `<br>Top device: <strong>${escapeHtml(topDevice?.[0] || "-")}</strong><br>Top recipient: <strong>${escapeHtml(topRecipient?.[0] || "-")}</strong>`;
+    }
+
+    async function refreshAll() {
+      await loadDevices();
+      await Promise.all([loadHistory(), loadFeatureData(), loadDashboardInsights()]);
+    }
+
+    async function connectDevice() {
+      const userId = document.getElementById("userId").value.trim();
+      if (!userId) {
+        setOutputState("qr", "is-error", "Pehle user ID dalo.");
+        return;
+      }
+      setOutputState("qr", "is-warning", "Connection request bhej di gayi hai...");
+      setSendFeedback("Connection request sent...", "warning");
+      try {
+        const data = await apiFetch("http://localhost:5000/api/device/connect", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId })
+        });
+        if (data.qr) renderQrString(data.qr);
+        else if (data.status === "connected") clearInlineQr();
+        else setOutputState("qr", "is-warning", "QR ya session update ka wait ho raha hai.");
+        setStatus(data.status || "waiting");
+        setSendFeedback(data.status === "connected" ? "Device connected successfully." : "Waiting for QR / connection update.", data.status === "connected" ? "success" : "warning");
+        await refreshAll();
+      } catch (error) {
+        setOutputState("qr", "is-error", error.message || "Connect failed");
+        setSendFeedback(error.message || "Connect failed", "error");
+      }
+    }
+
+    async function registerDeviceFromModal() {
+      const userId = document.getElementById("modalUserId").value.trim();
+      if (!userId) {
+        setOutputState("modalQr", "is-error", "Pehle user ID dalo.");
+        return;
+      }
+
+      setOutputState("modalQr", "is-warning", "QR generate ho raha hai...");
+
+      try {
+        const data = await apiFetch("http://localhost:5000/api/device/connect", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId })
+        });
+
+        document.getElementById("userId").value = userId;
+        modalWatchUserId = userId;
+        modalConnectedAnnouncements.delete(userId);
+
+        if (data.qr) {
+          renderModalQrString(data.qr);
+          renderQrString(data.qr);
+        } else if (data.status === "connected") {
+          clearInlineQr();
+          setOutputState("modalQr", "is-success", "Device already connected.");
+          showToast(`Connected new device: ${userId}`, "success");
+          setTimeout(closeRegisterModal, 700);
+        } else {
+          setOutputState("modalQr", "is-warning", "QR abhi ready nahi hai. Thodi der baad dubara try karo.");
+        }
+
+        setStatus(data.status || "waiting");
+        await refreshAll();
+      } catch (error) {
+        setOutputState("modalQr", "is-error", error.message || "QR generate failed");
+      }
+    }
+
+    async function refreshDevice(userId) {
+      try {
+        refreshingDeviceId = userId;
+        await loadDevices();
+        const data = await apiFetch(`http://localhost:5000/api/device/${userId}/refresh`, { method: "POST" });
+        if (data.qr) {
+          document.getElementById("userId").value = userId;
+          renderQrString(data.qr);
+        }
+        await refreshAll();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Refresh failed");
+      } finally {
+        refreshingDeviceId = "";
+        await loadDevices();
+      }
+    }
+
+    function startDevicesPolling() {
+      if (devicesPollTimer) {
+        clearInterval(devicesPollTimer);
+      }
+
+      devicesPollTimer = setInterval(() => {
+        loadDevices().catch(console.error);
+      }, 4000);
+    }
+
+    async function reloginDevice(userId) {
+      try {
+        const data = await apiFetch(`http://localhost:5000/api/device/${userId}/relogin`, { method: "POST" });
+        document.getElementById("userId").value = userId;
+        modalWatchUserId = userId;
+        modalConnectedAnnouncements.delete(userId);
+        if (data.qr) {
+          openRegisterModal();
+          document.getElementById("modalUserId").value = userId;
+          renderQrString(data.qr);
+          renderModalQrString(data.qr);
+        } else {
+          setOutputState("result", "is-warning", "Re-login started. QR ka wait ho raha hai.");
+        }
+        await refreshAll();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Re-login failed");
+      }
+    }
+
+    async function editDeviceName(userId) {
+      const currentDevice = deviceState.find((item) => item.userId === userId);
+      const currentName = currentDevice?.deviceName || userId;
+      const deviceName = window.prompt("Naya device nickname dalo", currentName || userId);
+      if (!deviceName) return;
+      try {
+        await apiFetch(`http://localhost:5000/api/device/${userId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deviceLabel: deviceName })
+        });
+        await refreshAll();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Rename failed");
+      }
+    }
+
+    async function deleteDevice(userId) {
+      try {
+        await apiFetch(`http://localhost:5000/api/device/${userId}`, { method: "DELETE" });
+        await refreshAll();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Remove failed");
+      }
+    }
+
+    async function sendMessage() {
+      const userId = document.getElementById("userId").value.trim();
+      const message = document.getElementById("message").value.trim();
+      const templateId = document.getElementById("templateId").value;
+      const mediaId = document.getElementById("mediaId").value;
+      const scheduleAt = document.getElementById("scheduleAt").value;
+      const timezone = document.getElementById("timezone").value;
+      if (!userId || !message) {
+        setOutputState("result", "is-error", "User ID aur message required hain.");
+        setSendFeedback("User ID aur message required hain.", "error");
+        return;
+      }
+      try {
+        setOutputState("result", "is-warning", "Message send ho raha hai...");
+        setSendFeedback("Sending message...", "warning");
+        const isScheduled = Boolean(scheduleAt);
+        if (activeMode === "single") {
+          const dialCode = document.getElementById("countryCode").value.trim().replace(/[^\d]/g, "");
+          const localNumber = document.getElementById("singleNumber").value.trim().replace(/[^\d]/g, "");
+          const repeatCount = Math.min(15, Math.max(1, Number.parseInt(document.getElementById("repeatCount").value || "1", 10) || 1));
+          if (!localNumber) {
+            setOutputState("result", "is-error", "Single mode me number required hai.");
+            setSendFeedback("Single mode me number required hai.", "error");
+            return;
+          }
+          const endpoint = isScheduled ? "http://localhost:5000/api/message/schedule" : mediaId ? "http://localhost:5000/api/message/send-media" : "http://localhost:5000/api/message/send";
+          const data = await apiFetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, number: localNumber, dialCode, message, templateId, mediaId, repeatCount, scheduledFor: scheduleAt ? new Date(scheduleAt).toISOString() : "", timezone })
+          });
+          const successMessage = isScheduled
+            ? "Single message scheduled successfully."
+            : repeatCount > 1
+              ? data.failureCount
+                ? `Single repeat done. Success: ${data.successCount}, Failed: ${data.failureCount}${data.results?.[0]?.error ? ` | ${data.results[0].error}` : ""}`
+                : `Single message sent ${data.successCount} times successfully.`
+              : data.failureCount
+                ? `Message failed: ${data.results?.[0]?.error || data.failureCount}`
+                : "Single message sent successfully.";
+          setOutputState("result", data.failureCount ? "is-warning" : "is-success", successMessage);
+          setSendFeedback(successMessage, data.failureCount ? "warning" : "success");
+        } else {
+          const numbers = document.getElementById("groupNumbers").value.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean);
+          if (!numbers.length) {
+            setOutputState("result", "is-error", "Group mode me numbers dalo.");
+            setSendFeedback("Group mode me numbers dalo.", "error");
+            return;
+          }
+          if (numbers.length > 10 && !document.getElementById("groupConfirm").checked) {
+            setOutputState("result", "is-error", "Large group blast ke liye confirmation checkbox on karo.");
+            setSendFeedback("Large group confirmation required hai.", "error");
+            return;
+          }
+          const endpoint = isScheduled ? "http://localhost:5000/api/message/schedule" : mediaId ? "http://localhost:5000/api/message/send-media" : "http://localhost:5000/api/message/send-group";
+          const data = await apiFetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, numbers, message, templateId, mediaId, confirm: document.getElementById("groupConfirm").checked, scheduledFor: scheduleAt ? new Date(scheduleAt).toISOString() : "", timezone })
+          });
+          const groupMessage = isScheduled ? "Group message scheduled successfully." : `Group send complete. Success: ${data.successCount}, Failed: ${data.failureCount}`;
+          setOutputState("result", isScheduled ? "is-success" : data.failureCount ? "is-warning" : "is-success", groupMessage);
+          setSendFeedback(groupMessage, isScheduled || !data.failureCount ? "success" : "warning");
+        }
+        setStatus("connected");
+        await refreshAll();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Send failed");
+        setSendFeedback(error.message || "Send failed", "error");
+      }
+    }
+
+    async function createTemplate() {
+      try {
+        await apiFetch("http://localhost:5000/api/features/templates", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("templateName").value.trim(),
+            content: document.getElementById("templateContent").value.trim(),
+            variables: document.getElementById("templateVariables").value.split(",").map((item) => item.trim()).filter(Boolean)
+          })
+        });
+        document.getElementById("templateName").value = "";
+        document.getElementById("templateContent").value = "";
+        document.getElementById("templateVariables").value = "";
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Template save failed");
+      }
+    }
+
+    async function createContact(contact = null, skipReload = false) {
+      try {
+        const payload = contact || {
+          name: document.getElementById("contactName").value.trim(),
+          number: document.getElementById("contactNumber").value.trim(),
+          tags: document.getElementById("contactTags").value.split(",").map((item) => item.trim()).filter(Boolean)
+        };
+        await apiFetch("http://localhost:5000/api/features/contacts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!contact) {
+          document.getElementById("contactName").value = "";
+          document.getElementById("contactNumber").value = "";
+          document.getElementById("contactTags").value = "";
+        }
+        if (!skipReload) {
+          await loadFeatureData();
+        }
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Contact save failed");
+      }
+    }
+
+    async function importContactsCsv() {
+      const lines = document.getElementById("contactsCsv").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      if (!lines.length) return;
+      try {
+        for (const line of lines) {
+          const [name = "", number = "", tags = ""] = line.split(",");
+          if (!number.trim()) continue;
+          await createContact({
+            name: name.trim(),
+            number: number.trim(),
+            tags: tags.split("|").map((item) => item.trim()).filter(Boolean)
+          }, true);
+        }
+        document.getElementById("contactsCsv").value = "";
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "CSV import failed");
+      }
+    }
+
+    async function createList() {
+      try {
+        const contactIds = Array.from(document.querySelectorAll("#listContacts input:checked")).map((input) => input.value);
+        await apiFetch("http://localhost:5000/api/features/lists", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("listName").value.trim(),
+            contactIds
+          })
+        });
+        document.getElementById("listName").value = "";
+        document.querySelectorAll("#listContacts input:checked").forEach((input) => {
+          input.checked = false;
+        });
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "List save failed");
+      }
+    }
+
+    async function createMedia() {
+      const file = document.getElementById("mediaFile").files[0];
+      if (!file) {
+        setOutputState("result", "is-error", "Media upload ke liye file choose karo.");
+        return;
+      }
+
+      const fileData = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("File read failed"));
+        reader.readAsDataURL(file);
+      });
+
+      try {
+        await apiFetch("http://localhost:5000/api/features/media", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("mediaName").value.trim() || file.name,
+            mimeType: document.getElementById("mediaMimeType").value.trim() || file.type || "application/octet-stream",
+            type: document.getElementById("mediaType").value,
+            caption: document.getElementById("mediaCaption").value.trim(),
+            data: fileData
+          })
+        });
+        document.getElementById("mediaName").value = "";
+        document.getElementById("mediaMimeType").value = "";
+        document.getElementById("mediaCaption").value = "";
+        document.getElementById("mediaFile").value = "";
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Media upload failed");
+      }
+    }
+
+    async function createOperator() {
+      try {
+        await apiFetch("http://localhost:5000/api/features/operators", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("operatorName").value.trim(),
+            role: document.getElementById("operatorRole").value,
+            active: document.getElementById("operatorActive").checked
+          })
+        });
+        document.getElementById("operatorName").value = "";
+        document.getElementById("operatorRole").value = "viewer";
+        document.getElementById("operatorActive").checked = true;
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Operator save failed");
+      }
+    }
+
+    async function deleteFeatureItem(bucket, itemId) {
+      try {
+        await apiFetch(`http://localhost:5000/api/features/${bucket}/${itemId}`, { method: "DELETE" });
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Delete failed");
+      }
+    }
+
+    async function deleteSchedule(itemId) {
+      try {
+        await apiFetch(`http://localhost:5000/api/message/schedule/${itemId}`, { method: "DELETE" });
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Schedule delete failed");
+      }
+    }
+
+    function applyListToGroup(listId) {
+      const list = featureState.lists.find((item) => item.id === listId);
+      if (!list) return;
+      const numbers = featureState.contacts
+        .filter((contact) => list.contactIds.includes(contact.id))
+        .map((contact) => contact.number)
+        .filter(Boolean);
+      switchMode("group");
+      document.getElementById("groupNumbers").value = numbers.join("\n");
+      showPage("messages");
+    }
+
+    function useMediaInComposer(mediaId) {
+      document.getElementById("mediaId").value = mediaId;
+      showPage("messages");
+    }
+
+    function toggleProfileMenu() {
+      document.getElementById("profileMenu").classList.toggle("open");
+    }
+
+    function closeProfileMenu() {
+      document.getElementById("profileMenu").classList.remove("open");
+    }
+
+    async function logoutUser() {
+      closeProfileMenu();
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.href = "/login";
+    }
+
+    document.querySelectorAll(".nav-btn[data-page]").forEach((button) => {
+      button.addEventListener("click", () => showPage(button.dataset.page));
+    });
+    document.getElementById("registerModal").addEventListener("click", (event) => {
+      if (event.target.id === "registerModal") closeRegisterModal();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeRegisterModal();
+    });
+    document.getElementById("profileMenuToggle")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleProfileMenu();
+    });
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".menu-wrap")) {
+        closeProfileMenu();
+      }
+    });
+    const topRight = document.querySelector(".top-right");
+    if (topRight) {
+      const welcome = document.querySelector(".top-left .welcome");
+      if (welcome) {
+        topRight.innerHTML = "";
+        topRight.appendChild(welcome);
+      } else {
+        topRight.innerHTML = "";
+      }
+    }
+    const menuToggle = document.getElementById("profileMenuToggle");
+    if (menuToggle) {
+      menuToggle.textContent = "v";
+    }
+    document.getElementById("templateId").addEventListener("change", () => {
+      const selected = featureState.templates.find((item) => item.id === document.getElementById("templateId").value);
+      document.getElementById("message").value = selected ? (selected.content || "") : "";
+    });
+    document.getElementById("historyUserFilter").addEventListener("change", () => loadHistory().catch(console.error));
+    document.getElementById("historyTypeFilter").addEventListener("change", () => loadHistory().catch(console.error));
+    document.getElementById("historyStatusFilter").addEventListener("change", () => loadHistory().catch(console.error));
+    document.getElementById("historyFromFilter").addEventListener("change", () => loadHistory().catch(console.error));
+    document.getElementById("historyToFilter").addEventListener("change", () => loadHistory().catch(console.error));
+
+    switchMode("single");
+    populateCountryCodes();
+    startDevicesPolling();
+    loadAuthUser().then(() => refreshAll()).catch(console.error);
+  </script>
+</body>
+</html>
