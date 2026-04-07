@@ -296,6 +296,8 @@
   <div id="toastStack" class="toast-stack"></div>
 
   <script>
+    const API_BASE = window.location.origin;
+
     let activeMode = "single";
     let apiRequests = 0;
     let refreshingDeviceId = "";
@@ -388,13 +390,16 @@
     async function apiFetch(url, options) {
       apiRequests += 1;
       document.getElementById("dashApiRequests").textContent = String(apiRequests).padStart(2, "0");
-      const response = await fetch(url, options);
+      const target = /^https?:\/\//i.test(url) ? url : `${API_BASE}${url.startsWith("/") ? url : `/${url}`}`;
+      const response = await fetch(target, options);
       if (response.status === 401) {
         window.location.href = "/login";
         throw new Error("Authentication required");
       }
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Request failed");
+      const contentType = response.headers.get("content-type") || "";
+      const raw = await response.text();
+      const data = contentType.includes("application/json") && raw ? JSON.parse(raw) : null;
+      if (!response.ok) throw new Error(data?.error || raw || `Request failed (${response.status})`);
       return data;
     }
 
@@ -511,13 +516,13 @@
 
     async function loadFeatureData() {
       const [templates, contacts, lists, media, operators, schedules, audit] = await Promise.all([
-        apiFetch("http://localhost:5000/api/features/templates"),
-        apiFetch("http://localhost:5000/api/features/contacts"),
-        apiFetch("http://localhost:5000/api/features/lists"),
-        apiFetch("http://localhost:5000/api/features/media"),
-        apiFetch("http://localhost:5000/api/features/operators"),
-        apiFetch("http://localhost:5000/api/features/schedules"),
-        apiFetch("http://localhost:5000/api/features/audit")
+        apiFetch("/api/features/templates"),
+        apiFetch("/api/features/contacts"),
+        apiFetch("/api/features/lists"),
+        apiFetch("/api/features/media"),
+        apiFetch("/api/features/operators"),
+        apiFetch("/api/features/schedules"),
+        apiFetch("/api/features/audit")
       ]);
 
       featureState.templates = templates.items || [];
@@ -587,7 +592,7 @@
     }
 
     async function loadDevices() {
-      const data = await apiFetch("http://localhost:5000/api/device");
+      const data = await apiFetch("/api/device");
       const devices = data.devices || [];
       deviceState = devices;
       const watchedDevice = modalWatchUserId ? devices.find((device) => device.userId === modalWatchUserId) : null;
@@ -646,7 +651,7 @@
       if (status) query.set("status", status);
       if (from) query.set("from", `${from}T00:00:00.000Z`);
       if (to) query.set("to", `${to}T23:59:59.999Z`);
-      const data = await apiFetch(query.toString() ? `http://localhost:5000/api/message/history?${query.toString()}` : "http://localhost:5000/api/message/history");
+      const data = await apiFetch(query.toString() ? `/api/message/history?${query.toString()}` : "/api/message/history");
       const items = data.history || [];
       const rows = document.getElementById("historyRows");
       rows.innerHTML = items.length ? items.map((item) => `
@@ -662,7 +667,7 @@
     }
 
     async function loadDashboardInsights() {
-      const data = await apiFetch("http://localhost:5000/api/message/history");
+      const data = await apiFetch("/api/message/history");
       const items = data.history || [];
       const now = new Date();
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -699,7 +704,7 @@
       setOutputState("qr", "is-warning", "Connection request bhej di gayi hai...");
       setSendFeedback("Connection request sent...", "warning");
       try {
-        const data = await apiFetch("http://localhost:5000/api/device/connect", {
+        const data = await apiFetch("/api/device/connect", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId })
@@ -726,7 +731,7 @@
       setOutputState("modalQr", "is-warning", "QR generate ho raha hai...");
 
       try {
-        const data = await apiFetch("http://localhost:5000/api/device/connect", {
+        const data = await apiFetch("/api/device/connect", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId })
@@ -759,7 +764,7 @@
       try {
         refreshingDeviceId = userId;
         await loadDevices();
-        const data = await apiFetch(`http://localhost:5000/api/device/${userId}/refresh`, { method: "POST" });
+        const data = await apiFetch(`/api/device/${userId}/refresh`, { method: "POST" });
         if (data.qr) {
           document.getElementById("userId").value = userId;
           renderQrString(data.qr);
@@ -785,7 +790,7 @@
 
     async function reloginDevice(userId) {
       try {
-        const data = await apiFetch(`http://localhost:5000/api/device/${userId}/relogin`, { method: "POST" });
+        const data = await apiFetch(`/api/device/${userId}/relogin`, { method: "POST" });
         document.getElementById("userId").value = userId;
         modalWatchUserId = userId;
         modalConnectedAnnouncements.delete(userId);
@@ -809,7 +814,7 @@
       const deviceName = window.prompt("Naya device nickname dalo", currentName || userId);
       if (!deviceName) return;
       try {
-        await apiFetch(`http://localhost:5000/api/device/${userId}`, {
+        await apiFetch(`/api/device/${userId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ deviceLabel: deviceName })
@@ -822,7 +827,7 @@
 
     async function deleteDevice(userId) {
       try {
-        await apiFetch(`http://localhost:5000/api/device/${userId}`, { method: "DELETE" });
+        await apiFetch(`/api/device/${userId}`, { method: "DELETE" });
         await refreshAll();
       } catch (error) {
         setOutputState("result", "is-error", error.message || "Remove failed");
@@ -854,7 +859,7 @@
             setSendFeedback("Single mode me number required hai.", "error");
             return;
           }
-          const endpoint = isScheduled ? "http://localhost:5000/api/message/schedule" : mediaId ? "http://localhost:5000/api/message/send-media" : "http://localhost:5000/api/message/send";
+          const endpoint = isScheduled ? "/api/message/schedule" : mediaId ? "/api/message/send-media" : "/api/message/send";
           const data = await apiFetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -883,7 +888,7 @@
             setSendFeedback("Large group confirmation required hai.", "error");
             return;
           }
-          const endpoint = isScheduled ? "http://localhost:5000/api/message/schedule" : mediaId ? "http://localhost:5000/api/message/send-media" : "http://localhost:5000/api/message/send-group";
+          const endpoint = isScheduled ? "/api/message/schedule" : mediaId ? "/api/message/send-media" : "/api/message/send-group";
           const data = await apiFetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -903,7 +908,7 @@
 
     async function createTemplate() {
       try {
-        await apiFetch("http://localhost:5000/api/features/templates", {
+        await apiFetch("/api/features/templates", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -928,7 +933,7 @@
           number: document.getElementById("contactNumber").value.trim(),
           tags: document.getElementById("contactTags").value.split(",").map((item) => item.trim()).filter(Boolean)
         };
-        await apiFetch("http://localhost:5000/api/features/contacts", {
+        await apiFetch("/api/features/contacts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -969,7 +974,7 @@
     async function createList() {
       try {
         const contactIds = Array.from(document.querySelectorAll("#listContacts input:checked")).map((input) => input.value);
-        await apiFetch("http://localhost:5000/api/features/lists", {
+        await apiFetch("/api/features/lists", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1002,7 +1007,7 @@
       });
 
       try {
-        await apiFetch("http://localhost:5000/api/features/media", {
+        await apiFetch("/api/features/media", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1025,7 +1030,7 @@
 
     async function createOperator() {
       try {
-        await apiFetch("http://localhost:5000/api/features/operators", {
+        await apiFetch("/api/features/operators", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1045,7 +1050,7 @@
 
     async function deleteFeatureItem(bucket, itemId) {
       try {
-        await apiFetch(`http://localhost:5000/api/features/${bucket}/${itemId}`, { method: "DELETE" });
+        await apiFetch(`/api/features/${bucket}/${itemId}`, { method: "DELETE" });
         await loadFeatureData();
       } catch (error) {
         setOutputState("result", "is-error", error.message || "Delete failed");
@@ -1054,7 +1059,7 @@
 
     async function deleteSchedule(itemId) {
       try {
-        await apiFetch(`http://localhost:5000/api/message/schedule/${itemId}`, { method: "DELETE" });
+        await apiFetch(`/api/message/schedule/${itemId}`, { method: "DELETE" });
         await loadFeatureData();
       } catch (error) {
         setOutputState("result", "is-error", error.message || "Schedule delete failed");

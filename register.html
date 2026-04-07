@@ -145,8 +145,14 @@
 
     async function api(url, options) {
       const response = await fetch(url, options);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Request failed");
+      const contentType = response.headers.get("content-type") || "";
+      const raw = await response.text();
+      const data = contentType.includes("application/json") && raw ? JSON.parse(raw) : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || raw || `Request failed (${response.status})`);
+      }
+
       return data;
     }
 
