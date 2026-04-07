@@ -255,6 +255,12 @@ function armSchedule(item) {
   const delay = Math.max(0, new Date(item.scheduledFor).getTime() - Date.now());
   const timer = setTimeout(async () => {
     try {
+      logAudit("schedule.execute", {
+        id: item.id,
+        userId: item.userId,
+        scheduledFor: item.scheduledFor
+      });
+
       await dispatchMessage({
         userId: item.userId,
         numbers: item.numbers.length ? item.numbers : [item.number],
@@ -265,6 +271,7 @@ function armSchedule(item) {
         messageType: item.numbers.length ? "Scheduled Group" : "Scheduled Single"
       });
       item.status = "sent";
+      delete item.error;
     } catch (error) {
       item.status = "failed";
       item.error = error.message;
@@ -279,12 +286,14 @@ function armSchedule(item) {
 
 function scheduleMessage(payload) {
   const schedules = load("schedules");
+  const singleNumber = buildRecipientNumber(payload.number, payload.dialCode);
+  const groupNumbers = validateNumbers(payload.numbers || []);
   const item = {
     id: payload.id || id("schedule"),
     type: "one_time",
     userId: payload.userId,
-    number: payload.number || "",
-    numbers: payload.numbers || [],
+    number: singleNumber,
+    numbers: groupNumbers,
     message: payload.message || "",
     templateId: payload.templateId || "",
     variables: payload.variables || {},
@@ -295,8 +304,22 @@ function scheduleMessage(payload) {
     createdAt: nowIso()
   };
 
+  if (!item.number && !item.numbers.length) {
+    throw new Error("At least one valid number is required for scheduling");
+  }
+
+  if (Number.isNaN(new Date(item.scheduledFor).getTime())) {
+    throw new Error("scheduledFor must be a valid date");
+  }
+
   schedules.unshift(item);
   save("schedules", schedules);
+  logAudit("schedule.create", {
+    id: item.id,
+    userId: item.userId,
+    scheduledFor: item.scheduledFor,
+    recipientCount: item.numbers.length || (item.number ? 1 : 0)
+  });
   armSchedule(item);
   return item;
 }
