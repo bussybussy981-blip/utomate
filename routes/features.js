@@ -55,6 +55,23 @@ router.post("/contacts", createHandler("contacts", (body) => ({
 })));
 router.delete("/contacts/:itemId", deleteHandler("contacts"));
 
+router.get("/leads", listHandler("leads"));
+router.post("/leads", createHandler("leads", (body) => ({
+  id: body.id || id("lead"),
+  name: body.name || "",
+  number: body.number || "",
+  email: body.email || "",
+  company: body.company || "",
+  tags: body.tags || [],
+  source: body.source || "",
+  status: body.status || "new",
+  notes: body.notes || "",
+  uploadType: body.uploadType || "standard",
+  createdAt: body.createdAt || nowIso(),
+  updatedAt: nowIso()
+})));
+router.delete("/leads/:itemId", deleteHandler("leads"));
+
 router.get("/lists", listHandler("lists"));
 router.post("/lists", createHandler("lists", (body) => ({
   id: body.id || id("list"),

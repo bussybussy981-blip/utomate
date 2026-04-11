@@ -4,6 +4,7 @@ const { readJson, writeJson } = require("./store");
 const defaults = {
   templates: [],
   contacts: [],
+  leads: [],
   lists: [],
   media: [],
   operators: [

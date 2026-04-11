@@ -102,7 +102,7 @@
           </div>
           <div class="stats" style="margin-top:18px">
             <article class="panel"><h2>Templates / Media</h2><div class="output">Templates: <strong id="dashTemplates">0</strong><br>Media files: <strong id="dashMedia">0</strong></div></article>
-            <article class="panel"><h2>Contacts / Team</h2><div class="output">Contacts: <strong id="dashContacts">0</strong><br>Operators: <strong id="dashOperators">0</strong></div></article>
+            <article class="panel"><h2>Contacts / Leads</h2><div class="output">Contacts: <strong id="dashContacts">0</strong><br>Leads: <strong id="dashLeads">0</strong><br>Operators: <strong id="dashOperators">0</strong></div></article>
           </div>
           <div class="stats" style="margin-top:18px">
             <article class="panel"><h2>Delivery Insights</h2><div id="dashDeliveryInsights" class="output">Sent: 0<br>Failed: 0<br>Retried: 0</div></article>
@@ -143,6 +143,42 @@
               </div>
               <div id="contactList" class="mini-list"></div>
               <div id="savedLists" class="mini-list"></div>
+            </article>
+            <article class="panel">
+              <h2>Lead Management</h2>
+              <p>Dashboard ke andar standard lead upload aur flexible lead upload dono options.</p>
+              <div class="grid-2">
+                <div class="stack">
+                  <input class="input" id="leadName" placeholder="Lead Name">
+                  <input class="input" id="leadNumber" placeholder="919355968324">
+                  <input class="input" id="leadEmail" placeholder="lead@email.com">
+                  <input class="input" id="leadCompany" placeholder="Company">
+                  <input class="input" id="leadTags" placeholder="hot, new, campaign-a">
+                  <button class="btn" type="button" onclick="createLead()">Save Lead</button>
+                </div>
+                <div class="stack">
+                  <input class="input" id="leadSource" placeholder="Meta Ads / Website / Manual">
+                  <input class="input" id="leadStatus" placeholder="new / followup / won">
+                  <textarea class="textarea" id="leadNotes" placeholder="Lead notes"></textarea>
+                  <button class="btn-outline" type="button" onclick="applyAllLeadsToGroup()">Use All Leads In Group</button>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="grid-2">
+                <div class="stack">
+                  <h3 style="margin:0">Standard Lead Upload</h3>
+                  <small>Name,Number,Email,Company,Tags,Source,Status,Notes</small>
+                  <textarea class="textarea" id="standardLeadsCsv" placeholder="Name,Number,Email,Company,Tags,Source,Status,Notes&#10;Amit,919355968324,amit@email.com,ABC Pvt Ltd,hot|north,Meta Ads,new,Interested in demo"></textarea>
+                  <button class="btn" type="button" onclick="importStandardLeads()">Upload Standard Leads</button>
+                </div>
+                <div class="stack">
+                  <h3 style="margin:0">Lead Upload</h3>
+                  <small>Loose CSV ya text bhi chalega. System number pick karke lead bana dega.</small>
+                  <textarea class="textarea" id="customLeadsCsv" placeholder="Amit, 919355968324, website inquiry&#10;Riya | +91 9876543210 | hot lead"></textarea>
+                  <button class="btn-outline" type="button" onclick="importCustomLeads()">Upload Leads</button>
+                </div>
+              </div>
+              <div id="leadList" class="mini-list"></div>
             </article>
             <article class="panel">
               <h2>Media Library</h2>
@@ -205,14 +241,13 @@
               </div>
               <div class="field"><label for="message">Message</label><textarea class="textarea" id="message" placeholder="Type your WhatsApp message here"></textarea></div>
               <div class="grid-2">
-                <div class="field"><label for="repeatCount">Repeat send</label><input class="input" id="repeatCount" type="number" min="1" max="15" value="1"><small>Ek hi number par same message 1 se 15 baar bhej sakte ho.</small></div>
+                <div class="field"><label for="repeatCount">Repeat send</label><input class="input" id="repeatCount" type="number" min="1" value="1"><small>Ek hi number par jitni baar chaho same message bhej sakte ho.</small></div>
                 <div class="field"><label for="timezone">Timezone</label><select class="select" id="timezone"><option value="Asia/Calcutta">Asia/Calcutta</option><option value="UTC">UTC</option><option value="Europe/London">Europe/London</option><option value="America/New_York">America/New_York</option></select><small>Timezone-aware scheduled delivery.</small></div>
               </div>
               <div class="grid-2">
                 <div class="field"><label for="scheduleAt">Schedule for later</label><input class="input" id="scheduleAt" type="datetime-local"><small>One-time future send. Recurring intentionally disabled.</small></div>
                 <div class="field"><label>&nbsp;</label><div class="compact-status is-idle">Immediate send ke liye schedule blank chhodo.</div></div>
               </div>
-              <div class="field hidden" id="groupConfirmWrap"><label><input id="groupConfirm" type="checkbox"> Confirm before large group blast</label><small>10+ recipients group send ke liye confirmation required hai.</small></div>
               <div class="composer-actions">
                 <div class="composer-buttons"><button class="btn" type="button" onclick="sendMessage()">Send Message</button></div>
                 <div id="sendFeedback" class="send-feedback">Ready to send.</div>
@@ -310,6 +345,7 @@
     const featureState = {
       templates: [],
       contacts: [],
+      leads: [],
       lists: [],
       media: [],
       operators: [],
@@ -428,7 +464,6 @@
       activeMode = mode;
       document.getElementById("modeBadgeText").textContent = mode;
       document.getElementById("groupField").classList.toggle("hidden", mode !== "group");
-      document.getElementById("groupConfirmWrap").classList.toggle("hidden", mode !== "group");
       document.getElementById("singleField").classList.toggle("hidden", mode !== "single");
       document.getElementById("singleTab").classList.toggle("active", mode === "single");
       document.getElementById("groupTab").classList.toggle("active", mode === "group");
@@ -515,9 +550,10 @@
     }
 
     async function loadFeatureData() {
-      const [templates, contacts, lists, media, operators, schedules, audit] = await Promise.all([
+      const [templates, contacts, leads, lists, media, operators, schedules, audit] = await Promise.all([
         apiFetch("/api/features/templates"),
         apiFetch("/api/features/contacts"),
+        apiFetch("/api/features/leads"),
         apiFetch("/api/features/lists"),
         apiFetch("/api/features/media"),
         apiFetch("/api/features/operators"),
@@ -527,6 +563,7 @@
 
       featureState.templates = templates.items || [];
       featureState.contacts = contacts.items || [];
+      featureState.leads = leads.items || [];
       featureState.lists = lists.items || [];
       featureState.media = media.items || [];
       featureState.operators = operators.items || [];
@@ -536,6 +573,7 @@
       document.getElementById("dashTemplates").textContent = featureState.templates.length;
       document.getElementById("dashMedia").textContent = featureState.media.length;
       document.getElementById("dashContacts").textContent = featureState.contacts.length;
+      document.getElementById("dashLeads").textContent = featureState.leads.length;
       document.getElementById("dashOperators").textContent = featureState.operators.length;
       document.getElementById("templateId").innerHTML = `<option value="">No template</option>` + featureState.templates.map((item) => `<option value="${item.id}">${escapeHtml(item.name)}</option>`).join("");
       document.getElementById("mediaId").innerHTML = `<option value="">No media</option>` + featureState.media.map((item) => `<option value="${item.id}">${escapeHtml(item.name)} (${escapeHtml(item.type)})</option>`).join("");
@@ -548,6 +586,9 @@
       document.getElementById("contactList").innerHTML = featureState.contacts.length
         ? featureState.contacts.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.name || "Unnamed contact")}</strong><small>${escapeHtml(item.number)}</small><div class="pill-list">${(item.tags || []).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div></div><div class="inline-actions"><button class="tiny-btn danger" type="button" onclick="deleteFeatureItem('contacts', '${item.id}')">Delete</button></div></div>`).join("")
         : `<div class="mini-item"><div><strong>No contacts</strong><small>CSV import ya manual add use karo.</small></div></div>`;
+      document.getElementById("leadList").innerHTML = featureState.leads.length
+        ? featureState.leads.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.name || "Unnamed lead")}</strong><small>${escapeHtml(item.number || "-")} | ${escapeHtml(item.source || "manual")} | ${escapeHtml(item.status || "new")}</small><div class="pill-list">${(item.tags || []).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div></div><div class="inline-actions"><button class="tiny-btn success" type="button" onclick="useLeadInComposer('${item.id}')">Use</button><button class="tiny-btn success" type="button" onclick="addLeadToGroup('${item.id}')">Add To Group</button><button class="tiny-btn danger" type="button" onclick="deleteFeatureItem('leads', '${item.id}')">Delete</button></div></div>`).join("")
+        : `<div class="mini-item"><div><strong>No leads</strong><small>Standard lead upload ya custom lead upload use karo.</small></div></div>`;
       document.getElementById("savedLists").innerHTML = featureState.lists.length
         ? featureState.lists.map((item) => `<div class="mini-item"><div><strong>${escapeHtml(item.name)}</strong><small>${item.contactIds?.length || 0} contacts</small></div><div class="inline-actions"><button class="tiny-btn success" type="button" onclick="applyListToGroup('${item.id}')">Use In Group</button><button class="tiny-btn danger" type="button" onclick="deleteFeatureItem('lists', '${item.id}')">Delete</button></div></div>`).join("")
         : `<div class="mini-item"><div><strong>No lists</strong><small>Saved groups yahan dikhengi.</small></div></div>`;
@@ -853,7 +894,7 @@
         if (activeMode === "single") {
           const dialCode = document.getElementById("countryCode").value.trim().replace(/[^\d]/g, "");
           const localNumber = document.getElementById("singleNumber").value.trim().replace(/[^\d]/g, "");
-          const repeatCount = Math.min(15, Math.max(1, Number.parseInt(document.getElementById("repeatCount").value || "1", 10) || 1));
+          const repeatCount = Math.max(1, Number.parseInt(document.getElementById("repeatCount").value || "1", 10) || 1);
           if (!localNumber) {
             setOutputState("result", "is-error", "Single mode me number required hai.");
             setSendFeedback("Single mode me number required hai.", "error");
@@ -883,16 +924,11 @@
             setSendFeedback("Group mode me numbers dalo.", "error");
             return;
           }
-          if (numbers.length > 10 && !document.getElementById("groupConfirm").checked) {
-            setOutputState("result", "is-error", "Large group blast ke liye confirmation checkbox on karo.");
-            setSendFeedback("Large group confirmation required hai.", "error");
-            return;
-          }
           const endpoint = isScheduled ? "/api/message/schedule" : mediaId ? "/api/message/send-media" : "/api/message/send-group";
           const data = await apiFetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, numbers, message, templateId, mediaId, confirm: document.getElementById("groupConfirm").checked, scheduledFor: scheduleAt ? new Date(scheduleAt).toISOString() : "", timezone })
+            body: JSON.stringify({ userId, numbers, message, templateId, mediaId, scheduledFor: scheduleAt ? new Date(scheduleAt).toISOString() : "", timezone })
           });
           const groupMessage = isScheduled ? "Group message scheduled successfully." : `Group send complete. Success: ${data.successCount}, Failed: ${data.failureCount}`;
           setOutputState("result", isScheduled ? "is-success" : data.failureCount ? "is-warning" : "is-success", groupMessage);
@@ -951,6 +987,42 @@
       }
     }
 
+    async function createLead(lead = null, skipReload = false) {
+      try {
+        const payload = lead || {
+          name: document.getElementById("leadName").value.trim(),
+          number: document.getElementById("leadNumber").value.trim(),
+          email: document.getElementById("leadEmail").value.trim(),
+          company: document.getElementById("leadCompany").value.trim(),
+          tags: document.getElementById("leadTags").value.split(",").map((item) => item.trim()).filter(Boolean),
+          source: document.getElementById("leadSource").value.trim(),
+          status: document.getElementById("leadStatus").value.trim() || "new",
+          notes: document.getElementById("leadNotes").value.trim(),
+          uploadType: "manual"
+        };
+        await apiFetch("/api/features/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!lead) {
+          document.getElementById("leadName").value = "";
+          document.getElementById("leadNumber").value = "";
+          document.getElementById("leadEmail").value = "";
+          document.getElementById("leadCompany").value = "";
+          document.getElementById("leadTags").value = "";
+          document.getElementById("leadSource").value = "";
+          document.getElementById("leadStatus").value = "";
+          document.getElementById("leadNotes").value = "";
+        }
+        if (!skipReload) {
+          await loadFeatureData();
+        }
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Lead save failed");
+      }
+    }
+
     async function importContactsCsv() {
       const lines = document.getElementById("contactsCsv").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
       if (!lines.length) return;
@@ -968,6 +1040,68 @@
         await loadFeatureData();
       } catch (error) {
         setOutputState("result", "is-error", error.message || "CSV import failed");
+      }
+    }
+
+    function cleanLeadNumber(value) {
+      return String(value || "").replace(/[^\d]/g, "");
+    }
+
+    async function importStandardLeads() {
+      const lines = document.getElementById("standardLeadsCsv").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      if (!lines.length) return;
+      try {
+        for (const [index, line] of lines.entries()) {
+          if (index === 0 && /name\s*,\s*number/i.test(line)) {
+            continue;
+          }
+          const [name = "", number = "", email = "", company = "", tags = "", source = "", status = "", notes = ""] = line.split(",");
+          const cleanNumber = cleanLeadNumber(number);
+          if (!cleanNumber) continue;
+          await createLead({
+            name: name.trim(),
+            number: cleanNumber,
+            email: email.trim(),
+            company: company.trim(),
+            tags: tags.split("|").map((item) => item.trim()).filter(Boolean),
+            source: source.trim() || "standard-upload",
+            status: status.trim() || "new",
+            notes: notes.trim(),
+            uploadType: "standard"
+          }, true);
+        }
+        document.getElementById("standardLeadsCsv").value = "";
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Standard lead upload failed");
+      }
+    }
+
+    async function importCustomLeads() {
+      const lines = document.getElementById("customLeadsCsv").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      if (!lines.length) return;
+      try {
+        for (const line of lines) {
+          const parts = line.split(/[|,]/).map((item) => item.trim()).filter(Boolean);
+          if (!parts.length) continue;
+          const numberPart = parts.find((item) => cleanLeadNumber(item).length >= 8) || "";
+          const cleanNumber = cleanLeadNumber(numberPart);
+          if (!cleanNumber) continue;
+          const name = parts[0] === numberPart ? "" : parts[0];
+          const notes = parts.filter((item) => item !== name && item !== numberPart).join(" | ");
+          await createLead({
+            name,
+            number: cleanNumber,
+            notes,
+            source: "lead-upload",
+            status: "new",
+            uploadType: "custom"
+          }, true);
+        }
+        document.getElementById("customLeadsCsv").value = "";
+        await loadFeatureData();
+      } catch (error) {
+        setOutputState("result", "is-error", error.message || "Lead upload failed");
       }
     }
 
@@ -1075,6 +1209,40 @@
         .filter(Boolean);
       switchMode("group");
       document.getElementById("groupNumbers").value = numbers.join("\n");
+      showPage("messages");
+    }
+
+    function addLeadToGroup(leadId) {
+      const lead = featureState.leads.find((item) => item.id === leadId);
+      if (!lead?.number) return;
+      switchMode("group");
+      const field = document.getElementById("groupNumbers");
+      const currentNumbers = field.value.split(/[\n,]+/).map((item) => item.trim()).filter(Boolean);
+      const merged = Array.from(new Set([...currentNumbers, lead.number]));
+      field.value = merged.join("\n");
+      showPage("messages");
+    }
+
+    function applyAllLeadsToGroup() {
+      const numbers = featureState.leads.map((item) => item.number).filter(Boolean);
+      switchMode("group");
+      document.getElementById("groupNumbers").value = Array.from(new Set(numbers)).join("\n");
+      showPage("messages");
+    }
+
+    function useLeadInComposer(leadId) {
+      const lead = featureState.leads.find((item) => item.id === leadId);
+      if (!lead?.number) return;
+      switchMode("single");
+      const dialCode = document.getElementById("countryCode").value.trim().replace(/[^\d]/g, "");
+      const cleanNumber = cleanLeadNumber(lead.number);
+
+      if (dialCode && cleanNumber.startsWith(dialCode) && cleanNumber.length > dialCode.length) {
+        document.getElementById("singleNumber").value = cleanNumber.slice(dialCode.length);
+      } else {
+        document.getElementById("singleNumber").value = cleanNumber;
+      }
+
       showPage("messages");
     }
 
