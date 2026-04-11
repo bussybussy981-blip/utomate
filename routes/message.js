@@ -16,8 +16,6 @@ const {
 } = require("../utils/appData");
 
 const history = load("history");
-const duplicateGuard = new Map();
-const rateWindow = new Map();
 const scheduleTimers = new Map();
 let scheduleRestoreInterval = null;
 
@@ -54,42 +52,6 @@ function addHistoryEntry(entry) {
   }
 
   save("history", history);
-}
-
-function canSendNow(userId, recipientCount) {
-  const now = Date.now();
-  const record = rateWindow.get(userId) || [];
-  const recent = record.filter((time) => now - time < 15000);
-
-  if (recent.length + recipientCount > 20) {
-    rateWindow.set(userId, recent);
-    return false;
-  }
-
-  for (let index = 0; index < recipientCount; index += 1) {
-    recent.push(now);
-  }
-
-  rateWindow.set(userId, recent);
-  return true;
-}
-
-function isDuplicate(userId, numbers, message, context = "") {
-  const key = `${userId}:${numbers.join(",")}:${message}:${context}`;
-  const now = Date.now();
-  const existing = duplicateGuard.get(key);
-
-  if (existing && now - existing < 10000) {
-    return true;
-  }
-
-  duplicateGuard.set(key, now);
-  return false;
-}
-
-function clearDuplicateGuard(userId, numbers, message, context = "") {
-  const key = `${userId}:${numbers.join(",")}:${message}:${context}`;
-  duplicateGuard.delete(key);
 }
 
 function applyTemplate(message, variables = {}) {
@@ -155,7 +117,7 @@ function requireOwnedDevice(req, userId) {
   return device;
 }
 
-async function dispatchMessage({ userId, numbers, message, templateId, variables, mediaId, messageType, duplicateContext = "" }) {
+async function dispatchMessage({ userId, numbers, message, templateId, variables, mediaId, messageType }) {
   const record = getSessionRecord(userId);
 
   if (!record?.sock || record.status !== "connected") {
@@ -168,19 +130,11 @@ async function dispatchMessage({ userId, numbers, message, templateId, variables
     throw new Error("At least one valid number is required");
   }
 
-  if (!canSendNow(userId, cleanNumbers.length)) {
-    throw new Error("Rate limit exceeded. Please wait a few seconds.");
-  }
-
   const templates = load("templates");
   const selectedTemplate = templateId ? templates.find((item) => item.id === templateId) : null;
   const finalMessage = selectedTemplate
     ? applyTemplate(selectedTemplate.content, variables)
     : applyTemplate(message, variables);
-
-  if (isDuplicate(userId, cleanNumbers, finalMessage, duplicateContext)) {
-    throw new Error("Duplicate send prevented. Please wait before retrying.");
-  }
 
   const media = mediaId ? load("media").find((item) => item.id === mediaId) : null;
   const results = [];
@@ -229,10 +183,6 @@ async function dispatchMessage({ userId, numbers, message, templateId, variables
     messageType,
     recipientCount: cleanNumbers.length
   });
-
-  if (!results.some((item) => item.success)) {
-    clearDuplicateGuard(userId, cleanNumbers, finalMessage, duplicateContext);
-  }
 
   return {
     success: results.some((item) => item.success),
@@ -398,7 +348,7 @@ router.get("/history", (req, res) => {
 router.post("/send", async (req, res) => {
   try {
     requireOwnedDevice(req, req.body.userId);
-    const repeatCount = Math.min(15, Math.max(1, Number.parseInt(req.body.repeatCount || 1, 10) || 1));
+    const repeatCount = Math.max(1, Number.parseInt(req.body.repeatCount || 1, 10) || 1);
     const recipientNumber = buildRecipientNumber(req.body.number, req.body.dialCode);
     const data = await dispatchMessage({
       userId: req.body.userId,
@@ -407,8 +357,7 @@ router.post("/send", async (req, res) => {
       templateId: req.body.templateId,
       variables: req.body.variables,
       mediaId: req.body.mediaId,
-      messageType: repeatCount > 1 ? "Single Repeat" : "Single",
-      duplicateContext: repeatCount > 1 ? `repeat:${repeatCount}` : "single"
+      messageType: repeatCount > 1 ? "Single Repeat" : "Single"
     });
 
     res.json({ ...data, mode: "single", repeatCount });
@@ -420,10 +369,6 @@ router.post("/send", async (req, res) => {
 router.post("/send-group", async (req, res) => {
   try {
     requireOwnedDevice(req, req.body.userId);
-    if (req.body.confirm !== true && validateNumbers(req.body.numbers || []).length > 10) {
-      return res.status(400).json({ error: "Confirm large group blast before sending" });
-    }
-
     const data = await dispatchMessage({
       userId: req.body.userId,
       numbers: req.body.numbers || [],
@@ -431,8 +376,7 @@ router.post("/send-group", async (req, res) => {
       templateId: req.body.templateId,
       variables: req.body.variables,
       mediaId: req.body.mediaId,
-      messageType: "Group",
-      duplicateContext: "group"
+      messageType: "Group"
     });
 
     res.json({ ...data, mode: "group" });
@@ -452,8 +396,7 @@ router.post("/send-media", async (req, res) => {
       templateId: req.body.templateId,
       variables: req.body.variables,
       mediaId: req.body.mediaId,
-      messageType: "Media",
-      duplicateContext: "media"
+      messageType: "Media"
     });
 
     res.json({ ...data, mode: "media" });
