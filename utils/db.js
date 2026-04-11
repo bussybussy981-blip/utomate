@@ -18,6 +18,7 @@ db.exec(`
     id TEXT PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
+    is_super_admin INTEGER NOT NULL DEFAULT 0,
     password_hash TEXT NOT NULL,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -58,6 +59,12 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_auth_sessions_token_hash ON auth_sessions(token_hash);
   CREATE INDEX IF NOT EXISTS idx_devices_user_id ON devices(user_id);
 `);
+
+const userColumns = db.prepare("PRAGMA table_info(users)").all().map((column) => column.name);
+
+if (!userColumns.includes("is_super_admin")) {
+  db.exec("ALTER TABLE users ADD COLUMN is_super_admin INTEGER NOT NULL DEFAULT 0");
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -118,17 +125,58 @@ function createUser({ username, name, passwordHash }) {
     id: makeId("user"),
     username,
     name,
+    isSuperAdmin: 0,
     passwordHash,
     createdAt: timestamp,
     updatedAt: timestamp
   };
 
   db.prepare(`
-    INSERT INTO users (id, username, name, password_hash, created_at, updated_at)
-    VALUES (@id, @username, @name, @passwordHash, @createdAt, @updatedAt)
+    INSERT INTO users (id, username, name, is_super_admin, password_hash, created_at, updated_at)
+    VALUES (@id, @username, @name, @isSuperAdmin, @passwordHash, @createdAt, @updatedAt)
   `).run(user);
 
   return user;
+}
+
+function ensureSuperAdmin({ username, name, passwordHash }) {
+  const existing = getUserByUsername(username);
+  const timestamp = nowIso();
+
+  if (!existing) {
+    const user = {
+      id: makeId("user"),
+      username,
+      name,
+      isSuperAdmin: 1,
+      passwordHash,
+      createdAt: timestamp,
+      updatedAt: timestamp
+    };
+
+    db.prepare(`
+      INSERT INTO users (id, username, name, is_super_admin, password_hash, created_at, updated_at)
+      VALUES (@id, @username, @name, @isSuperAdmin, @passwordHash, @createdAt, @updatedAt)
+    `).run(user);
+
+    return getUserByUsername(username);
+  }
+
+  db.prepare(`
+    UPDATE users
+    SET name = @name,
+        is_super_admin = 1,
+        password_hash = @passwordHash,
+        updated_at = @updatedAt
+    WHERE username = @username
+  `).run({
+    username,
+    name,
+    passwordHash,
+    updatedAt: timestamp
+  });
+
+  return getUserByUsername(username);
 }
 
 function createAuthSession({ userId, tokenHash, expiresAt }) {
@@ -393,6 +441,7 @@ module.exports = {
   getUserByUsername,
   getUserById,
   createUser,
+  ensureSuperAdmin,
   createAuthSession,
   getAuthSessionByHash,
   touchAuthSession,

@@ -109,6 +109,7 @@ function getAuthUserFromRequest(req) {
     id: user.id,
     username: user.username,
     name: user.name,
+    isSuperAdmin: Boolean(user.is_super_admin),
     createdAt: user.created_at,
     updatedAt: user.updated_at
   };

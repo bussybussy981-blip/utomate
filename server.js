@@ -6,11 +6,20 @@ const authRoutes = require("./routes/auth");
 const deviceRoutes = require("./routes/device");
 const messageRoutes = require("./routes/message");
 const featureRoutes = require("./routes/features");
+const { ensureSuperAdmin } = require("./utils/db");
 const { requireAuth, getAuthUserFromRequest } = require("./utils/auth");
+const { hashPassword } = require("./utils/auth");
 const { connectSavedSessions } = require("./whatsapp/socket");
 
 const app = express();
 const port = Number(process.env.PORT) || 5000;
+
+ensureSuperAdmin({
+  username: "tada",
+  name: "Tada",
+  passwordHash: hashPassword("tadatada")
+});
+
 app.use(cors());
 app.use(express.json({ limit: "25mb" }));
 
